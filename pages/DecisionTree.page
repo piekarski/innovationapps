@@ -1,0 +1,58 @@
+<apex:page controller="DecisionTreeController" sidebar="false" showHeader="false" standardStylesheets="false">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+    <style>
+        input[type="radio"]+label {
+            font-weight: 500;
+            padding-right: 10px;            
+        }
+    </style>
+    <div class="container">
+        <apex:form >
+            <apex:pageMessages ></apex:pageMessages>
+            <div class="form-group">
+                <fieldset>
+                    <legend></legend>
+                        <div style="padding-left:2%;padding-right:2%;">
+                            <apex:outputPanel id="topPanel" rendered="{!IF((questionTemp.Question_Label__c != null && questionTemp.Question_Label__c !=''),true, false)}"> 
+                                <apex:outputPanel rendered="{!(questionTemp.Question_Type__c=='RadioPicklist' && questionTemp.HelpText__c!='Dropdown')}">
+                                    <apex:outputText value="{!questionTemp.Question_Label__c}"></apex:outputText>  <br/>              
+                                        <apex:selectRadio style="padding-right:5px;" styleClass="font-weight:400" value="{!questionRes.Response__c}" >
+                                            <apex:selectOptions value="{!answerOption}" ></apex:selectOptions>                            
+                                        </apex:selectRadio>
+                                </apex:outputPanel>   
+                                <apex:outputPanel rendered="{!(questionTemp.Question_Type__c=='RadioPicklist' && questionTemp.HelpText__c=='Dropdown')}">
+                                    <apex:outputText value="{!questionTemp.Question_Label__c}"></apex:outputText>  <br/>              
+                                    <apex:selectList value="{!questionRes.Response__c}" multiselect="false" size="1">
+                                        <apex:selectOptions value="{!answerOption}"></apex:selectOptions>
+                                    </apex:selectList>
+                                </apex:outputPanel> 
+                                <apex:outputPanel rendered="{!(questionTemp.Question_Type__c=='Result')}">
+                                    <apex:outputText value="{!questionTemp.Question_Label__c}"></apex:outputText>  <br/> <br/> 
+                                    <table cellpadding="10">
+                                        <apex:repeat value="{!resultPageFieldsList}" var="fieldapi">
+                                            <tr>
+                                                <td style="text-align: right;padding-right: 10px;">
+                                                    <apex:outputLabel >{!fieldAPIWithLabel[fieldapi]} </apex:outputLabel>
+                                                </td>
+                                                <td style="padding-bottom: 10px;">
+                                                    <apex:inputField value="{!questionRes[fieldapi]}"/>
+                                                </td>
+                                            </tr>        
+                                        </apex:repeat>                                
+                                    </table>
+                                </apex:outputPanel> 
+                                <br/>
+                                <div style="padding-top:20px;">
+                                <apex:commandButton value="Previous" action="{!previousQuestion}" rendered="{!isPreviousQuestion}" reRender="topPanel"/> &nbsp;&nbsp;
+                                <apex:commandButton value="Save & Next" action="{!saveAnswer}" rendered="{!questionTemp.Question_Type__c!='Result'}" reRender="topPanel"/>
+                                <apex:commandButton value="Submit" action="{!completedAssessments}" oncomplete="window.close();" rendered="{!questionTemp.Question_Type__c == 'Result'}"/>&nbsp;&nbsp;
+                                <apex:commandButton value="Cancel" onclick="window.close();" reRender="topPanel"/>
+                                </div>    
+                            </apex:outputPanel>
+                        </div>
+                </fieldset>
+            </div>
+        </apex:form>
+    </div>
+</apex:page>

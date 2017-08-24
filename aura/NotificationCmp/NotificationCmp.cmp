@@ -1,0 +1,10 @@
+<aura:component access="public">
+    
+    <aura:handler event="c:NotificationEvt" action="{!c.showToast}"/>
+    <aura:handler name="closeNotificationEvent" event="c:NotificationCloseEvt"
+                  action="{!c.closeNotification}"/>
+    
+    {!v.body}
+    
+    
+</aura:component>

@@ -1,0 +1,27 @@
+<aura:component access="public">
+      <aura:handler name="SettingSelectedTab" event="c:SettingSelectedTab" action="{!c.handleSettingSelectedTab}" />
+      <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+      <aura:attribute name="accList" type="Object[]" default="" access="public"/>
+      <aura:attribute name="wrapperClass" type="String" access="public"/>
+      <aura:attribute name="ulClass" type="String" access="public"/>
+      <aura:attribute name="liClass" type="String" access="public"/>
+      <aura:attribute name="aClass" type="String" access="public"/>
+      <aura:attribute name="tooltipText" type="String" access="public"/>
+    <aura:method name="activeStatusdefault" action="{!c.navigateDefaultActiveState}">
+        <aura:attribute name="activeTab" type="Integer"/>
+    </aura:method>
+
+      <div class="{# ' slds-grid slds-wrap ' + v.wrapperClass}">
+          <div class=" slds-size--1-of-1 ">
+              <div class="">
+                  <ul class="{#v.ulClass}" role="tablist" aura:id="list">
+                      <aura:iteration items="{#v.accList}" var="acc" indexVar="index">
+                          <c:TabComponent label="{!acc.name}" tooltipText="{#acc.tooltipText}" liClass="{#v.liClass}" aClass="{#v.aClass}" active='{#acc.active}' componentLink='{#acc.componentLink}' index='{!index}' />
+                      </aura:iteration>
+                  </ul>
+              </div>
+          </div>
+      </div>
+
+  </aura:component>

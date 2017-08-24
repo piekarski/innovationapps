@@ -1,0 +1,60 @@
+<aura:component access="public" extends="c:examFieldBase" controller="ExamDescribeHelper">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.newValue}" action="{!c.changeObjValue}"/>
+    <aura:attribute name="oldValue" type="String" access="public"/>
+    <aura:attribute name="newValue" type="String" access="public"/>
+    <aura:attribute name="options" type="List" access="public"/>
+
+      <div class="{!join( ' ', v.cssClass, 'slds-grid--align-spread slds-grid slds-wrap slds-grid--vertical-align-center')}">
+        <aura:if isTrue="{!v.editMode}">
+          <a class="exam-bold label-override" onclick="{!c.changevalue}">
+            {!v.fieldLabel}
+          </a>
+        </aura:if>
+        <aura:if isTrue="{!v.defaultMode == 'edit'}">
+            <div class="slds-col slds-grid slds-grid--align-spread slds-wrap slds-grid--vertical-align-center">
+                <span aura:id="createInputCmp" class="slds-col slds-m-right--medium slds-p-vertical--x-small">
+                    <ui:inputSelect value="{!v.oldValue}" class="slds-select ">
+                        <aura:iteration items="{!v.options}" var="option">
+                            <ui:inputSelectOption text="{!option}" label="{!option}"/>
+                        </aura:iteration>
+                    </ui:inputSelect>
+                </span>
+                <span class="slds-col slds-p-vertical--x-small">
+                    <a class="slds-button slds-button--neutral slds-button--save slds-m-right--small" onclick="{!c.updateFieldValue}">
+                        Update
+                    </a>
+                    <a class="slds-button slds-button--neutral" onclick="{!c.cancelUpdateFieldVal}">
+                        Cancel</a>
+                </span>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.defaultMode == 'view'}">
+          <aura:if isTrue="{!v.showLabel == false}">
+
+            <div class="slds-size--1-of-1 " aura:id="createOutputCmp">
+              <ui:outputTextArea value="{!v.newValue}"/>
+            </div>
+            <aura:set attribute="else">
+              <div class="slds-size-1-of-1 " aura:id="createOutputCmp">
+                <a class="label-override" onclick="{!c.changevalue}">
+                  <ui:outputTextArea value="{!v.newValue}"/>
+                </a>
+              </div>
+            </aura:set>
+          </aura:if>
+        </aura:if>
+          
+          <aura:if isTrue="{!v.defaultMode == 'new'}">
+              <span class="slds-col">{!v.fieldLabel}</span>
+              <span class="slds-col">
+                  <ui:inputSelect value="{!v.newValue}" class="slds-select ">
+                        <aura:iteration items="{!v.options}" var="option">
+                            <ui:inputSelectOption text="{!option}" label="{!option}"/>
+                        </aura:iteration>
+                    </ui:inputSelect>
+              </span>
+              
+          </aura:if>
+    </div>
+</aura:component>

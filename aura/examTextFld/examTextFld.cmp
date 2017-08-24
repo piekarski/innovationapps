@@ -1,0 +1,51 @@
+<aura:component access="public" extends="c:examFieldBase">
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+  <aura:handler name="change" value="{!v.newValue}" action="{!c.changeObjValue}"/>
+  <aura:attribute name="oldValue" type="String" access="public"/>
+  <aura:attribute name="newValue" type="String" access="public"/>
+  <div class="{!join( ' ', v.cssClass, 'slds-size--1-of-1 slds-grid slds-wrap  slds-grid--align-spread slds-grid--vertical-align-center')}">
+    <aura:if isTrue="{!v.editMode}">
+      <a class="exam-bold label-override" onclick="{!c.changevalue}">
+        {!v.fieldLabel}
+      </a>
+    </aura:if>
+    <aura:if isTrue="{!v.defaultMode == 'edit'}">
+      <div class="slds-col slds-size--1-of-1 slds-grid slds-wrap ">
+        <span aura:id="createInputCmp" class="slds-col slds-size--2-of-3 slds-m-right--medium slds-p-vertical--x-small">
+          <ui:inputText class="slds-input" value="{!v.oldValue}"/>
+        </span>
+        <span class="slds-col slds-p-vertical--x-small">
+          <a class="slds-button slds-button--neutral slds-button--save slds-m-right--small" onclick="{!c.updateFieldValue}">
+            Update
+          </a>
+          <a class="slds-button slds-button--neutral" onclick="{!c.cancelUpdateFieldVal}">
+            Cancel</a>
+        </span>
+      </div>
+    </aura:if>
+    <aura:if isTrue="{!v.defaultMode == 'view'}">
+        
+     <aura:if isTrue="{!v.showLabel == false}">
+        <div class="" aura:id="createOutputCmp">
+          <ui:outputText value="{!v.newValue}"/>
+        </div>
+        <aura:set attribute="else">
+          <div class="" aura:id="createOutputCmp">
+            <a class="label-override" onclick="{!c.changevalue}">
+              <ui:outputText value="{!v.newValue}"/>
+            </a>
+          </div>
+        </aura:set>
+      </aura:if>
+    </aura:if>
+  </div>
+    
+    <aura:if isTrue="{!v.defaultMode == 'new'}">
+        <span class="slds-col">{!v.fieldLabel}</span>
+        <span class="slds-col">
+          <ui:inputText class="slds-p-around--medium" value="{!v.newValue}"/>
+        </span>
+        
+    </aura:if>
+    
+</aura:component>

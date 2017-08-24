@@ -1,0 +1,15 @@
+<apex:page sidebar="false" showHeader="True">
+    <apex:pageBlock title=" ">
+        <apex:pageBlockSection columns="1">
+           <apex:outputLink value="EntryPage" id="Home"> Back </apex:outputLink>
+        </apex:pageBlockSection>
+	</apex:pageBlock>
+    <apex:pageBlock title="Excluded Time Entry">
+        <apex:pageBlockSection columns="1">
+           <flow:interview name="ExcludedTimeRequest"/>
+        </apex:pageBlockSection>
+	</apex:pageBlock>
+    
+	<apex:enhancedList type="VBA_CC_Tracking_Excluded_Request__c" height="300" rowsPerPage="50" id="ExcludedList" />
+    <apex:enhancedList type="VBA_CCTracking_Agent_Production_Data__c" height="300" rowsPerPage="25" id="AgentDataList" />
+</apex:page>

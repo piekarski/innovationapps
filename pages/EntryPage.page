@@ -1,0 +1,27 @@
+<apex:page >
+	<apex:pageBlock >
+    	<apex:pageBlockSection collapsible="True" columns="3">
+            <apex:pageBlockSectionItem >
+                <b>Excluded Requests</b><p></p>
+          	</apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+				<b>Leave Requests</b><p></p>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <b>IRIS Inquiries Completed</b><p></p>	
+        	</apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection collapsible="True" columns="3">
+            <apex:pageBlockSectionItem >
+                <apex:outputLink value="ExcludedTime" id="theHourglass"><apex:image id="theMain" value="{!$Resource.maintenance}" width="200" height="200"/></apex:outputLink>
+        	</apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+        	<apex:outputLink value="LeaveRequest" id="theLeave"><apex:image id="theClock" value="{!$Resource.Clock}" width="200" height="200"/></apex:outputLink>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+        	<apex:outputLink value="IRISProduction" id="theIRIS"><apex:image id="theCon" value="{!$Resource.construction}" width="200" height="200"/></apex:outputLink>
+            </apex:pageBlockSectionItem>		
+        </apex:pageBlockSection>	
+	</apex:pageBlock>
+    <apex:enhancedList type="VBA_CCTracking_Agent_Production_Data__c" height="300" width="800" rowsPerPage="25" id="AgentDataList" />   
+</apex:page>

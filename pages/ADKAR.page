@@ -1,0 +1,24 @@
+<apex:page >
+  <!-- Begin Default Content REMOVE THIS -->
+  <hr color="#88180F" size="3px"></hr>
+
+<h1>MyVA Survey Metrics and Questions</h1>
+<br></br>
+<br> (Q.1)   <strong>Awareness</strong> of how the change impacts individuals </br>
+<br>“I know how the VA transformation relates to me specifically.”</br>
+ <br> 
+(Q.2)   <strong>Desire</strong> to participate and support the change</br>
+<br> “I want to make positive changes in how I perform my job at VA.”</br>
+ <br>
+(Q.3)   <strong>Knowledge</strong> of how to change</br>
+<br>
+“I know how to make positive changes in my work unit.”</br>
+  <br>
+(Q.4)   <strong>Ability</strong> to implement the change on a day-to-day basis</br>
+<br>
+“I am able (including supported) to make positive changes in how I perform my job on a day-to-day basis.”
+ </br>
+
+
+  <!-- End Default Content REMOVE THIS -->
+</apex:page>

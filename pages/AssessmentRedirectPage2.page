@@ -1,0 +1,9 @@
+<apex:page sidebar="false" >
+  <br/><br/><br/><br/>
+  <!--<center> <h1> <font color="red"> Should add appropriate contents here</font></h1> </center>-->
+  <table width="100%" style="border-bottom: 3px solid #00335b;border-top-width:30px;padding-bottom:0px;padding-right:0%;padding-left:0%;">
+     <tr><td width="10px"><apex:image url="{!$Resource.NCA_Logo}"/></td></tr>
+    </table>
+   
+  <br/><br/>  <center> <h1>Thank you for your valuable feedback!</h1></center>
+</apex:page>

@@ -1,0 +1,13 @@
+<aura:component access="global">
+<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+<aura:attribute name="attributes" type="Object[]" default="" access="public"/>
+<aura:attribute name="menuLinkText" type="String" access="public" />
+<aura:attribute name="initialValue" type="String" access="public" />
+<aura:attribute name="objList" type="sobject[]" access="public" />
+<aura:attribute name="objApi" type="String" access="public" />
+<aura:attribute name="displayField" type="Object[]"  access="global"  />
+<aura:attribute name="objFilter" type="String" access="public"/>
+<aura:attribute name="objOrder" type="String" access="public"/>
+
+<c:ctrlLinkMenu menuLinkText="{#v.menuLinkText}" attributes="{!v.attributes}"/>
+</aura:component>

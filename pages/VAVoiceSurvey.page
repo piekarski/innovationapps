@@ -1,0 +1,867 @@
+<apex:page controller="CreateAMAndAnswersController" showHeader="false" sidebar="false" cache="false">
+
+    <c:remoetk ></c:remoetk>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+        <apex:includeScript value="{!URLFOR($Resource.Datepicker,'Datepicker/jquery-1.10.2.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.Datepicker,'Datepicker/jquery-ui.min.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.AngularGoogleMap, '/AngularGoogleMapsJS/lodash.min.js')}"/>
+        <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"/>
+        <apex:includeScript value="https://code.angularjs.org/1.2.0-rc.3/angular-sanitize.js"/>
+        <apex:stylesheet value="{!URLFOR($Resource.Datepicker,'Datepicker/jquery-ui.min.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.SLDS052, '/assets/styles/salesforce-lightning-design-system-vf.css')}" />
+        <apex:outputPanel rendered="{!ISBLANK(customStylesConfigured)}">
+            
+        </apex:outputPanel>
+
+        <style>
+
+            .vfHelpText {
+                text-decoration: none;
+                position: absolute;
+                display: none;
+                width: 15em;
+                z-index: 12;
+                background-color: #fefdb9;
+                padding: 2px 5px;
+                border: 1px solid orange;
+                text-align: left;
+                white-space: normal;
+                font-weight: normal;
+                color: #000;
+            }
+        </style>
+    </head>
+    
+    <body id="bodyId" style="display:none">
+        <div ng-app="mainApp">
+            <div ng-controller="mainCtrller" > 
+                <div ng-bind-html="headerObj"></div>
+                <div class="slds slds-p-around--xx-large slds-container--large slds-container--center">
+                    <div class="main" role="main">
+                        <c:VAVoiceComponent />
+                    </div>
+                </div>
+                <div ng-bind-html="footerObj"></div>
+            </div>
+        </div>
+    </body>
+    
+    <script type="text/javascript">
+       
+        Visualforce.remoting.timeout = 120000; // Set timeout at page level
+        
+    </script>    
+    <script>
+
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.charset = 'utf-8';
+        script.id = 'testing';
+        script.defer = true;
+        script.async = true;
+        script.text = [
+            '{!JSENCODE(customScriptConfigured)}'
+        ].join('');
+        document.getElementsByTagName('head')[0].appendChild(script);
+
+        var link = document.createElement('link');
+        link.setAttribute('rel', 'stylesheet');
+        link.setAttribute('type', 'text/css');
+        link.setAttribute('href', '{!JSENCODE(customStylesConfigured)}');
+        document.getElementsByTagName('head')[0].appendChild(link);
+
+        var underscore = angular.module('underscore', []);
+        underscore.factory('_', ['$window', function($window) {
+            return $window._; // assumes underscore has already been loaded on the page
+        }]);
+        var app = angular.module('mainApp', ['underscore', 'ngSanitize']);
+        app.directive('file', function(){
+            
+            return {
+                scope: {
+                    file: '='
+                },
+                link: function(scope, el, attrs){
+                    el.bind('change', function(event){
+                        var files = event.target.files;
+                        var file = files[0];
+
+                        var reader = new FileReader();
+                        reader.onload = loaded;
+                        reader.onerror = errorHandler;
+                        reader.readAsDataURL(file);
+
+                        function loaded(evt){
+                            scope.file = {};
+                            var fileContent = String(evt.target.result);
+                            fileContent = fileContent.substr(fileContent.indexOf(',') + 1);
+
+                            scope.file.resultbody = fileContent ;
+                            scope.file.name = file ? file.name : undefined;
+                            scope.file.contenttype = file ? file.type : undefined;
+
+                            scope.$apply(); 
+                            console.log(scope.file);
+                        }                            
+                        function errorHandler(evt) {
+                            if (evt.target.error.name == 'NotReadableError') {
+                                alert('File could not be read');
+                            }
+                            else {
+                                alert(evt.target.error);
+                            }
+                        }
+                    });
+                }
+            };
+        });
+        app.service('mainappservice', function($q,_) {
+
+            var sectionQuestionTemplatesObj = {};
+            var tobeInsertedAnswerResponseObj = {};
+
+            this.queryQuestionTemplates = function(assessmentTemplateIdStr) {
+
+                var defer = $q.defer();
+                sectionQuestionTemplatesObj.hasActionSuccess = false;
+                sectionQuestionTemplatesObj.inputObj = {};
+
+                    CreateAMAndAnswersController.returnSectionAndQuestionTemplate(assessmentTemplateIdStr, function(result, event) {
+
+                        if(event.status) {
+
+                            if (typeof result === 'object') {
+
+                                sectionQuestionTemplatesObj.hasActionSuccess = true;
+                                sectionQuestionTemplatesObj.inputObj = result;
+                                defer.resolve( JSON.parse(_.unescape(JSON.stringify(sectionQuestionTemplatesObj))) );
+                            } else {
+
+                            defer.reject(sectionQuestionTemplatesObj);
+                        }
+
+                    }else{
+
+                        defer.reject(sectionQuestionTemplatesObj);
+                    }
+                });
+                return defer.promise;
+            }
+
+            this.saveUsrEnteredAnswers = function(response, comment, photo, assessmentTemplateId, amId) {
+
+                var defer = $q.defer();
+                var errorFlag = false;
+                tobeInsertedAnswerResponseObj.showErrMessage = false;
+                tobeInsertedAnswerResponseObj.showASMSection = false;
+                tobeInsertedAnswerResponseObj.showAccountSection = false;
+                tobeInsertedAnswerResponseObj.showSectionQuestions = true;
+                tobeInsertedAnswerResponseObj.hasActionSuccess = false;
+                tobeInsertedAnswerResponseObj.errMessage = '';
+
+                /* Below code prepares answers array */
+
+                var answerList = [];
+                $.each(response, function(key, value) { 
+
+                    var answerObj = {};
+                    answerObj.questiontemplateId = key;
+                    if (comment.hasOwnProperty(key)) {
+                        answerObj.comment = comment[key];
+                    }
+                    if (typeof value == 'object'){
+                        var answer = ''
+                        for (var option in value){
+                            if (value[option] && option != "$$hashKey") {
+                                if (answer.length > 0) {
+                                    answer += '~'+option;
+                                } else {
+                                    answer = option;
+                                }
+                            }
+                        }
+                        answerObj.response = answer;
+                    }
+                    else{
+                        answerObj.response = value;
+                    }
+                    answerList.push(answerObj);
+                });
+
+                if (answerList.length > 0) {
+
+                    /* Below code calls controller method to insert all answer records */
+                    var attList = [];
+             CreateAMAndAnswersController.saveAnswerRecords(answerList, assessmentTemplateId, '{!$CurrentPage.parameters.objId}', '{!assessibleFieldName}', '{!amReqdStatus}', '{!assessibleObjReferenceForAnsCreation}', amId, function(result, event) {
+
+                        if (event.status) {
+
+                            if (result != '' && result != null) {
+                                tobeInsertedAnswerResponseObj.hasActionSuccess = true;
+                                tobeInsertedAnswerResponseObj.showErrMessage = false;
+                                tobeInsertedAnswerResponseObj.errMessage = '';
+                                if (result != 'No Answer Records to save') {
+                                    tobeInsertedAnswerResponseObj.resultObj = JSON.parse( _.unescape(result) );
+                                }
+                                else {
+                                    tobeInsertedAnswerResponseObj.resultObj = result;
+                                }
+                                defer.resolve(tobeInsertedAnswerResponseObj);
+                            }
+
+                        } else {
+    
+                            tobeInsertedAnswerResponseObj.showErrMessage = true;
+                            tobeInsertedAnswerResponseObj.errMessage = 'Remote Action Call Failed';
+                            defer.reject(tobeInsertedAnswerResponseObj);
+                        }
+                    });
+                }
+                else {
+
+                    tobeInsertedAnswerResponseObj.showErrMessage = true;
+                    tobeInsertedAnswerResponseObj.errMessage = 'Please enter answer for any of the available questions and then save the record';
+                    defer.reject(tobeInsertedAnswerResponseObj);
+                }
+                return defer.promise;
+            }
+            this.callDecisionTreeAnswerSaveMethod = function(decisionTreeObj, amId) {
+
+                var defer = $q.defer();
+                CreateAMAndAnswersController.saveDecisionTreeAnswerRecords(decisionTreeObj, '{!$CurrentPage.parameters.tempId}', '{!$CurrentPage.parameters.objId}', '{!assessibleFieldName}', '{!amReqdStatus}', '{!assessibleObjReferenceForAnsCreation}', amId, function(result, event) {
+                    if (event.status) {
+                        if (result != 'DecisionTree Answer have not save') {
+                            defer.resolve( JSON.parse(_.unescape(result)) );
+                        }
+                        else {
+                            defer.resolve( result );
+                        }
+                    }
+                }, function(error) {
+                    defer.reject('error');
+                });
+                return defer.promise;
+            }
+
+            /* Splits Available Picklist Options In Question Template */
+            this.splitAvailableAnswerOptions = function(strOption) {
+
+                var options = [];
+                if(strOption != null && strOption != '') {
+                    options = strOption.split('~');
+                }
+                return options;
+            }
+
+            /** Decision Tree Functionality Starts **/
+            this.queryQuestionTemplatesForCurrentActiveTab = function(assessmentTemplateId) {
+
+                var defer = $q.defer();
+                var client = new remotetk.Client();
+                var questionsList = [];
+                var questionNamewithQuestionTemplate = {};
+                var resultQuestionNamewithQuestionTemplate = {};
+                var nextQuestionObj = {};
+                nextQuestionObj.hasActionSuccess = false;
+                var resultQuestionIdDefaultValueObj = {};
+                
+                client.query("SELECT Id, Name, ExAM__Subquestion_Label__c, ExAM__Weight_of_Answer__c, ExAM__HelpText__c,"+ 
+                                " ExAM__Section_Question__c, ExAM__Section_Question__r.ExAM__Questionnaire_Section__c, ExAM__Question_Label__c, ExAM__Question_Order_No__c,"+
+                                " ExAM__Question_Type__c, ExAM__Next_Question__c, ExAM__Is_Mandatory__c "+
+                            " FROM ExAM__Question_Template__c "+
+                            " WHERE ExAM__Section_Question__r.ExAM__Questionnaire_Section__c = \'"+assessmentTemplateId+"\'"+
+                            " ORDER BY ExAM__Question_Order_No__c ASC", function(responseQuery){
+
+                    questionsList = responseQuery.records;
+                    for (i = 0; i < questionsList.length; i++) { 
+
+                        questionNamewithQuestionTemplate[questionsList[i].Name] = questionsList[i];
+                        
+                        //Storing QuestionType equals Result in a separate JSON String
+                        if (questionsList[i].ExAM__Question_Type__c == 'Result') {
+
+                            resultQuestionNamewithQuestionTemplate[ questionsList[i].Id ] = questionsList[i];
+
+                            
+                                resultQuestionIdDefaultValueObj[ questionsList[i].Id ] = answerFieldApiNameValueObj;
+                            }
+                        }
+                     
+                    //console.log(':::::'+JSON.stringify(answerFieldApiNameValueObj));
+                    console.log(':::::'+JSON.stringify(resultQuestionIdDefaultValueObj));
+                    nextQuestionObj.hasActionSuccess = true;
+                    nextQuestionObj.questionNameAndTemplateJsonString = questionNamewithQuestionTemplate;
+                    nextQuestionObj.resultNameAndTemplateJsonString = resultQuestionNamewithQuestionTemplate;
+                    nextQuestionObj.resultQuestionIdDefaultVal = resultQuestionIdDefaultValueObj;
+                    defer.resolve( nextQuestionObj );
+                }, function(error) {
+                    console.log('::::<<<>>>:::::',error);
+                });
+                return defer.promise;
+            }
+
+            this.decisionTreeOpenWindow = function(answer, questionTemplate, questionNamewithQuestionTemplate, resultQuestionNamewithQuestionTemplate) {
+
+                var decisionTreeQuestion = '';
+
+                if (questionTemplate.ExAM__Next_Question__c != null && questionTemplate.ExAM__Next_Question__c != '') {
+                    var questionPosition = -1;
+                    
+                    if (questionTemplate.ExAM__Subquestion_Label__c != null && questionTemplate.ExAM__Subquestion_Label__c != '') {
+
+                        var answerOptions = questionTemplate.ExAM__Subquestion_Label__c.split('~');
+                        for (i=0; i < answerOptions.length; i++) {
+                            if (answer == answerOptions[i]) {
+                                questionPosition = i;
+                                break;
+                            }
+                        }
+                    }
+                    if (questionTemplate.ExAM__Next_Question__c != null && questionTemplate.ExAM__Next_Question__c != '') {
+
+                        var nextquestionList = questionTemplate.ExAM__Next_Question__c.split('~');    
+                        
+                        if(nextquestionList.length > questionPosition) {
+                            decisionTreeQuestion = questionNamewithQuestionTemplate[nextquestionList[questionPosition]];
+                        } else if(nextquestionList.length > 0) {
+                            decisionTreeQuestion = questionNamewithQuestionTemplate[nextquestionList[0]];
+                        } else {
+                            decisionTreeQuestion = resultQuestionNamewithQuestionTemplate[ questionTemplate.Id ];
+                        }   
+                        $('.DecisionTree').removeClass('slds-modal__close');
+                        $('.DecisionTree').addClass('slds-fade-in-open');
+                    } else {
+
+                        decisionTreeQuestion = resultQuestionNamewithQuestionTemplate[ questionTemplate.Id ];
+                    }
+                }
+                return decisionTreeQuestion;
+            }
+
+            this.decisionTreeNextQuestion = function(answer, questionTemplate, questionNamewithQuestionTemplate, resultQuestionNamewithQuestionTemplate, previousQuestion) {
+                
+                var nextQuestionObj = {};
+                nextQuestionObj.hasNextQuestion = true;
+
+                if (angular.isUndefined(answer)) {
+                    return false;
+                }
+                
+                var questionPosition = -1;
+                if (questionTemplate.ExAM__Subquestion_Label__c != null && questionTemplate.ExAM__Subquestion_Label__c != '') {
+                    var answerOptions = questionTemplate.ExAM__Subquestion_Label__c.split('~');
+                    for (i=0; i < answerOptions.length; i++) {
+                        if (answer == answerOptions[i]) {
+                            questionPosition = i;
+                            break;
+                        }
+                    }
+                }
+                
+                if (questionTemplate.ExAM__Next_Question__c != null && questionTemplate.ExAM__Next_Question__c != '') {
+
+                    var nextquestionList = questionTemplate.ExAM__Next_Question__c.split('~');    
+
+                    if(nextquestionList.length > questionPosition) {
+
+                        decisionTreeQuestion = questionNamewithQuestionTemplate[nextquestionList[questionPosition]];
+                        nextQuestionObj.decisionTreeQuestion = decisionTreeQuestion;
+                    } else if(nextquestionList.length > 0) {
+
+                        decisionTreeQuestion = questionNamewithQuestionTemplate[nextquestionList[0]];
+                        nextQuestionObj.decisionTreeQuestion = decisionTreeQuestion;
+                    } else {
+
+                        if ( !angular.isDefined(resultQuestionNamewithQuestionTemplate[ questionTemplate.Id ]) ) {
+    
+                            nextQuestionObj.hasNextQuestion = false;
+                        }
+                        decisionTreeQuestion = resultQuestionNamewithQuestionTemplate[ questionTemplate.Id ];
+                        nextQuestionObj.decisionTreeQuestion = decisionTreeQuestion;
+                    }                        
+                } else {
+
+                    if ( !angular.isDefined(resultQuestionNamewithQuestionTemplate[ questionTemplate.Id ]) ) {
+
+                        nextQuestionObj.hasNextQuestion = false;
+                    }
+                    decisionTreeQuestion = resultQuestionNamewithQuestionTemplate[ questionTemplate.Id ];
+                    nextQuestionObj.decisionTreeQuestion = decisionTreeQuestion;
+                }
+                if (questionTemplate != null && questionTemplate.Name != null && 
+                    decisionTreeQuestion != null && decisionTreeQuestion.Name != null
+                ) {
+                    
+                    previousQuestion[decisionTreeQuestion.Name] =  questionTemplate;
+                    nextQuestionObj.previousQuestion = previousQuestion;
+                }
+                return nextQuestionObj;
+            }
+            this.callAttachmentUploadMethod = function(attachmentList) {
+
+                var defer = $q.defer();
+
+                CreateAMAndAnswersController.saveAttachments(attachmentList, function(result, event) {
+                    if (event.status) {
+                        defer.resolve( result );
+                    }
+                },
+                function(error) {
+                    defer.reject( error );
+                });
+                return defer.promise;
+            }
+            /** Decision Tree Functionality Ends **/
+
+            /* Notes Div Toggle Code */
+            this.opencommentBox = function(selQuestionId) {                
+                $('.answercomment').removeClass('slds-modal__close');
+                $('.answercomment').addClass('slds-fade-in-open');
+            }
+            this.closecommentBox = function() {
+                $('.answercomment').addClass('slds-modal__close');
+                $('.answercomment').removeClass('slds-fade-in-open');
+            }
+            this.savecommentBox = function() {    
+                $('.answercomment').addClass('slds-modal__close');
+                $('.answercomment').removeClass('slds-fade-in-open');
+            }
+
+            /* Attachment Div Toggle Code */
+            this.openPhotoUploadBox = function() {
+                $('.photoUpload').removeClass('slds-modal__close');
+                $('.photoUpload').addClass('slds-fade-in-open');
+            }
+            this.closePhotoUploadBox = function() {
+                $('.photoUpload').addClass('slds-modal__close');
+                $('.photoUpload').removeClass('slds-fade-in-open');
+            }
+            this.savePhotoBox = function() {    
+                $('.photoUpload').addClass('slds-modal__close');
+                $('.photoUpload').removeClass('slds-fade-in-open');
+            }
+
+            /** Image Icons Rendering Functionality Starts **/
+            this.callToggleIconVisibility = function(isIcnEnable, ans) {
+
+                var showIcn = false;
+
+                if ( ans == false && isIcnEnable == 'true' ) {
+                    showIcn = true;
+                }
+                return showIcn;
+            }
+            /** Image Icons Rendering Functionality Ends **/
+
+        });
+        app.controller('mainCtrller', function($scope, mainappservice, _) {
+            
+            document.getElementById("bodyId").style.display="block";
+            $scope.sectionAndQuestionTemplateObj = [];
+            $scope.showASMSection = false;
+            $scope.showAccountSection = false;
+            $scope.showSectionQuestions = false;
+            $scope.showASMTable = false;
+            $scope.showAcctTable = false;
+            $scope.photoQuestionId = '';
+            $scope.selecteQuestionId = '';
+            $scope.response = {};
+            $scope.comment = {};
+            $scope.photo = {};
+            $scope.errMessage = '';
+            $scope.showPgMessage = false;
+            $scope.showErrMessage = false;
+            $scope.selectedAnswerVal = '';
+            $scope.errorFlag = false;
+            $scope.setPgMsgColor = 'red';
+            $scope.decisionTreeStartQuestionId = '';
+            $scope.hasAnswersExistsForUnitTemplate = 'false';
+            $scope.fromSitePage = true;
+            $scope.templateNameObj = '{!templateName}';
+
+            /** Variables For Decision Tree Functionality **/
+            $scope.DecisionTreeresponse = {};
+            $scope.decisionTreeQuestion = {};
+            $scope.previousQuestion = {};            
+            $scope.questionsList = [];
+            $scope.questionNamewithQuestionTemplate = {};
+            $scope.resultQuestionNamewithQuestionTemplate = {};
+
+            $scope.showImageUploadIcon = '{!showImgIcon}';
+            $scope.showCommentsIcon = '{!showNotesIcon}';
+            $scope.showClearIcon = '{!showRefreshIcon}';
+
+            /** Variable to store assessment completion url **/
+            $scope.redirectURL = '{!redirectUrl}';
+
+            /** 
+                Variable to display error message when there are no section templates below the given
+                Assessment template
+            **/
+            $scope.hasSectionTemplates = true;
+
+            $scope.showModalWindow = '{!showModalWindow}';
+            if ($scope.showModalWindow == 'true' ) {
+                $scope.modalWindowTxt = '{!JSENCODE(modalWindowTxt)}';
+            }
+
+            $scope.calledOnce = false;
+
+            /**
+                Variable to store assignment manager id created
+                via Decision Tree Answer record creation process
+            **/
+            $scope.createdAMId = '';
+
+            $scope.showIcon = function(calledFromIcon, doNotCreateAnswer) {
+                return mainappservice.callToggleIconVisibility(calledFromIcon, doNotCreateAnswer);
+            }
+
+            if ('{!JSENCODE(headerStr)}' != null && '{!JSENCODE(headerStr)}' != '') {
+                $scope.headerObj = '{!JSENCODE(headerStr)}';
+            }
+            if ('{!JSENCODE(footerStr)}' != null && '{!JSENCODE(footerStr)}' != '') {
+                $scope.footerObj = '{!JSENCODE(footerStr)}';
+            }
+
+            $('.maskDiv, .slds-spinner--small').show();
+
+            if ('{!JSENCODE(decisionTreeResultString)}' != null && '{!JSENCODE(decisionTreeResultString)}' != '') {
+                $scope.decisionTreeResultTemplate = JSON.parse('{!JSENCODE(decisionTreeResultString)}');
+            }
+
+            mainappservice.queryQuestionTemplates('{!$CurrentPage.parameters.tempId}').then(function(data){
+
+                if (data.hasActionSuccess === true) {
+
+                    $('.maskDiv, .slds-spinner--small').hide();
+                    $scope.sectionAndQuestionTemplateObj = data.inputObj;
+                    if ( $scope.sectionAndQuestionTemplateObj.length == 0 ) {
+                        $scope.hasSectionTemplates = false;
+                    }
+                    else {
+                        $scope.showSectionQuestions = true;
+                    }
+                } else {
+                    $('.maskDiv, .slds-spinner--small').hide();
+                }
+            },function(data){
+
+                $('.maskDiv, .slds-spinner--small').hide();           
+                $scope.showErrMessage = true;
+                $scope.errMessage = 'Remote Method Invocation Failed';
+            });
+
+            /**
+                Code Below calls the function in service which queries all the question template
+                below the section templates under assessment template of current assignment manager
+            **/
+            mainappservice.queryQuestionTemplatesForCurrentActiveTab('{!$CurrentPage.parameters.tempId}').then(function(data){
+
+                if (data.hasActionSuccess === true) {
+
+                    $scope.questionNamewithQuestionTemplate = data.questionNameAndTemplateJsonString;
+                    $scope.resultQuestionNamewithQuestionTemplate = data.resultNameAndTemplateJsonString;
+                    $scope.resultQuestionIdDefaultVal = data.resultQuestionIdDefaultVal;
+                }
+            },function(data){
+            });
+
+            $scope.saveUsrEnteredAnswerOptions = function() {
+
+                $scope.errorFlag = false;
+
+                $('.validatetrue:visible').each(function() {
+    
+                    if ($(this).prop('nodeName') != 'DIV') {
+                        $scope.selectedAnswerVal = ($(this).val().trim() != '?') ? $(this).val().trim() : '';
+                    }else {
+                        $(this).children().children().each(function() {
+    
+                            if($(this).hasClass( "ng-touched" )) {
+                                $scope.selectedAnswerVal = $(this).val();
+                            }
+                        });
+                    }
+                    if($scope.selectedAnswerVal.length > 0) {
+    
+                        $(this).parent('div').removeClass('slds-has-error');
+                        $(this).parent('div').find('.requiredMessage').css('display','none');
+                    } else {
+    
+                        $(this).parent('div').addClass('slds-has-error');
+                        $(this).parent('div').find('.requiredMessage').css('display','');
+                        $scope.errorFlag = true;
+                    }
+                });
+
+                if (!$scope.errorFlag) {
+
+                    if ($scope.showModalWindow == 'true' && !$scope.calledOnce) {
+                        $scope.calledOnce = true;
+                        $scope.openModalWindoww();
+                    }
+                    else if ($scope.showModalWindow == 'false' || $scope.calledOnce) {
+
+                        $scope.closeModalWindoww();
+
+                        $scope.setPgMsgColor = 'red';
+                        $('.maskDiv, .slds-spinner--small').show();
+                        mainappservice.saveUsrEnteredAnswers($scope.response, $scope.comment, $scope.photo, '{!$CurrentPage.parameters.tempId}', $scope.createdAMId).then(function(data){
+    
+                            if (data.showErrMessage && !data.hasActionSuccess) {
+
+                                $('.maskDiv, .slds-spinner--small').hide();
+                                $scope.showErrMessage = data.showErrMessage;
+                                $scope.errMessage = data.errMessage;                            
+                            } else if (!data.showErrMessage && data.hasActionSuccess) {
+
+                                $('.maskDiv, .slds-spinner--small').hide();
+                                $scope.setPgMsgColor = 'green';
+                                $scope.showErrMessage = true; // setting this variable as true to show success message
+                                $scope.errMessage = data.errMessage;
+                                $scope.showSectionQuestions = data.showSectionQuestions;
+
+                                if ( data.resultObj != 'No Answer Records to save' ) {
+
+                                    $scope.callAttachmentUploadJS( data.resultObj );
+                                }
+
+                                //clear all variables after answer save happens successfully in backend
+                                $scope.response = {};
+                                $scope.comment = {};
+                                $scope.photo = {};
+
+                                if ( $scope.redirectURL.length > 0 ) {
+                                    window.open($scope.redirectURL, '_self');
+                                }
+                                else {
+                                    location.reload(true);
+                                }
+                            } 
+                        },function(data){
+                        
+                            $('.maskDiv, .slds-spinner--small').hide();
+                            $scope.showErrMessage = data.showErrMessage;
+                            $scope.errMessage = data.errMessage;                            
+                        });
+                    }
+                }
+            }
+
+            $scope.callAttachmentUploadJS = function(resultobject) {
+
+                var attachmentlist = [];
+                var attachmentQuestionId;
+                $.each($scope.photo, function(key, value) {
+
+                    if (resultobject[key]) {
+
+                        var answeridList = [];
+                        attachmentQuestionId = key;
+
+                        if (typeof resultobject[key] == 'object') {
+                            answeridList.push(resultobject[key][0]);
+                        }
+                        else {
+                            answeridList.push(resultobject[key]);
+                        }
+
+                        for (j = 0; j < answeridList.length; j++) {        
+                            var attach = {};
+                            attach.fileNameStr        = value.name;
+                            attach.cType = value.contenttype;
+                            attach.imgContent        = value.resultbody;
+                            attach.parentIdStr    = answeridList[j];
+                            attach.isPrivate   = false;
+                            attachmentlist.push( attach );
+                        }                                        
+                    }
+                });
+                if (attachmentlist.length > 0) {
+
+                    mainappservice.callAttachmentUploadMethod(attachmentlist).then(function(data) {
+                        delete $scope.photo[attachmentQuestionId];
+                    },
+                    function(data) {
+                        console.log(data);
+                    });
+                }
+            }
+
+            /** Start Decision Tree Functionality Related Method Invocation **/
+            $scope.openDecisionTreePopUp = function(usrEnteredAnswerOpt, forWhichQuestion) {
+
+                $scope.DecisionTreeresponse = {};
+                $scope.decisionTreeQuestion = mainappservice.decisionTreeOpenWindow(usrEnteredAnswerOpt, forWhichQuestion, $scope.questionNamewithQuestionTemplate, $scope.resultQuestionNamewithQuestionTemplate);
+                $scope.decisionTreeStartQuestionId = forWhichQuestion.Id;
+
+                if ($scope.decisionTreeQuestion.ExAM__Question_Type__c == 'Result' ) {
+
+                    $scope.populateDefaultValuesForResultTemplate( $scope.decisionTreeQuestion.Id );
+                }
+            }
+            $scope.closeDecisionTreePopUp = function() {
+                $('.DecisionTree').addClass('slds-modal__close');
+                $('.DecisionTree').removeClass('slds-fade-in-open');
+                $scope.DecisionTreeresponse = {};
+                if (angular.isDefined($scope.response[$scope.decisionTreeStartQuestionId])) {
+                    delete $scope.response[$scope.decisionTreeStartQuestionId];
+                }
+            }
+            $scope.renderNextQuestionInDecisionTree = function(usrEnteredAnswerOpt, forWhichQuestion) {
+
+                if (angular.isDefined(usrEnteredAnswerOpt)) {
+    
+                    $scope.nextQuestObj = mainappservice.decisionTreeNextQuestion(usrEnteredAnswerOpt, forWhichQuestion, $scope.questionNamewithQuestionTemplate, $scope.resultQuestionNamewithQuestionTemplate, $scope.previousQuestion);
+                    if ($scope.nextQuestObj.hasNextQuestion) {
+
+                        $scope.previousQuestion = $scope.nextQuestObj.previousQuestion;
+                        $scope.decisionTreeQuestion = $scope.nextQuestObj.decisionTreeQuestion;
+
+                        if ($scope.decisionTreeQuestion.ExAM__Question_Type__c == 'Result' ) {
+
+                            $scope.populateDefaultValuesForResultTemplate( $scope.decisionTreeQuestion.Id );
+                        }
+                    }
+                    else {
+
+                        $scope.saveChosenAnswerOptionInDecisionTreeQuestions(true);
+                    }
+                }
+            }
+            $scope.previousQuestion = function(decisionTree_QuestionName) {
+                if ($scope.previousQuestion != null && $scope.previousQuestion[decisionTree_QuestionName] != null) {
+                    $scope.decisionTreeQuestion = $scope.previousQuestion[decisionTree_QuestionName];                    
+                }
+            }
+            $scope.saveChosenAnswerOptionInDecisionTreeQuestions = function(isNextbutton) {
+                $('.DecisionTree').addClass('slds-modal__close');
+                $('.DecisionTree').removeClass('slds-fade-in-open');
+                var i = 0;
+                var j = 1;
+                var length = Object.keys($scope.DecisionTreeresponse).length;
+                var decisionTreeanswerList = [];
+                angular.forEach($scope.DecisionTreeresponse, function(value, key) {
+
+                    if (key.indexOf('~~') > 0) {
+    
+                        if( i == 0 ) {
+                            answerObj = {};
+                            answerObj.ExAM__Question_Template__c = key.split('~~')[0];
+                            //answerObj.ExAM__Issue_Request__c = $scope.currentASMIdStr;
+                            i = i+1;
+                        }
+                        var fieldApiNameStr = key.split('~~')[1];
+                        answerObj[ fieldApiNameStr ] = value;
+                        if (j == length) {
+                            this.push(answerObj);
+                        }
+                    }
+                    else {
+                        if ({!NOT(skip_Answer_For_Decision_Tree_Steps)}) {
+                            answerObj = {};
+                            answerObj.ExAM__Question_Template__c = key;                        
+                            answerObj.ExAM__Response__c = value;
+                            //answerObj.ExAM__Issue_Request__c = $scope.currentASMIdStr;
+                            this.push(answerObj);
+                        } else if (isNextbutton) {
+                            if (j == length) {
+                                answerObj = {};
+                                answerObj.ExAM__Question_Template__c = key;                        
+                                answerObj.ExAM__Response__c = value;
+                                //answerObj.ExAM__Issue_Request__c = $scope.currentASMIdStr;
+                                this.push(answerObj);
+                            }
+                        }
+                    }
+                    j++;
+                }, decisionTreeanswerList);
+
+                if (decisionTreeanswerList.length > 0) {
+
+                    mainappservice.callDecisionTreeAnswerSaveMethod(decisionTreeanswerList, $scope.createdAMId).then(function(data) {
+
+                        if (data != 'DecisionTree Answer have not save') {
+
+                            var questionTempIdWithAnsIdObj = {};
+                            var isFirst = true;
+                            angular.forEach(data, function(value, key) {
+                                if (isFirst) {
+                                    $scope.createdAMId = data[key].ExAM__Issue_Request__c;
+                                    isFirst = false;
+                                }
+                                questionTempIdWithAnsIdObj[key] = value.Id;
+                            });
+                            $scope.callAttachmentUploadJS( questionTempIdWithAnsIdObj );
+                            $scope.$apply();
+                        }
+                    },
+                    function(data) {
+                        console.log(data);
+                    });
+                }
+            }
+            $scope.populateDefaultValuesForResultTemplate = function(resultTemplateId) {
+
+                angular.forEach($scope.decisionTreeResultTemplate, function(value, key) {
+
+                    if ( $scope.DecisionTreeresponse[resultTemplateId+'~~'+value.fieldAPIName] == '' || 
+                         $scope.DecisionTreeresponse[resultTemplateId+'~~'+value.fieldAPIName] == null
+                    ) {
+
+                        $scope.DecisionTreeresponse[resultTemplateId+'~~'+value.fieldAPIName] = $scope.resultQuestionIdDefaultVal[resultTemplateId][value.fieldAPIName];
+                    }
+                });
+            }
+            /** End Decision Tree Functionality Related Method Invocation **/
+            
+            $scope.splitOptions = function(strOption) {
+                return mainappservice.splitAvailableAnswerOptions(strOption);
+            }
+
+            $scope.opencomment = function(selQuestionId) {                
+                $scope.selecteQuestionId = selQuestionId;
+                mainappservice.opencommentBox();
+            }
+            $scope.closecomment = function() {
+                mainappservice.closecommentBox();
+            }
+            $scope.savecomment = function() {    
+                mainappservice.savecommentBox();
+            }
+
+            $scope.openPhotoUpload = function(selQuestionId) {
+                document.getElementById('fid').value = '';                 
+                $scope.photoQuestionId = selQuestionId;
+                mainappservice.openPhotoUploadBox();
+            }            
+            $scope.closePhotoUpload = function() {
+                mainappservice.closePhotoUploadBox();
+            }
+            $scope.savePhoto = function() {
+                mainappservice.savePhotoBox();
+            }
+            $scope.resetChosenAnswerForThisQuestionTemplate = function(selQuestionId) {
+
+                if (angular.isDefined($scope.response[selQuestionId])) {
+                    delete $scope.response[selQuestionId];
+                }
+            }
+            $scope.openAssessmentTemplateRecord = function() {
+
+                window.location.href = '/'+'{!$CurrentPage.parameters.tempId}';
+            }
+            $scope.openModalWindoww = function() {
+                $('.ModalWindoww').addClass('slds-fade-in-open');
+                $('.ModalWindoww').removeClass('slds-modal__close');
+            }
+            $scope.closeModalWindoww = function() {
+                $scope.calledOnce = false;
+                $('.ModalWindoww').addClass('slds-modal__close');
+                $('.ModalWindoww').removeClass('slds-fade-in-open');
+            }
+        });
+    </script>
+</apex:page>

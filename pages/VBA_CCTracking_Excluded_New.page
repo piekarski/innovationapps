@@ -1,0 +1,15 @@
+<apex:page standardController="VBA_CC_Tracking_Excluded_Request__c">
+    <h1>Loading...</h1>
+
+         <script>
+         
+            function redirect(){
+
+                top.location.href='/VBA/apex/Entry_Page_Excluded_Request';
+            }
+  
+            window.onload = redirect;
+            
+        </script>
+
+</apex:page>

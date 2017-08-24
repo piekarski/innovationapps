@@ -1,0 +1,125 @@
+<apex:page sidebar="false" showHeader="true" title="Innovation Applications" id="InnovationApplications" language="en" applyHtmlTag="true">
+
+    <head>
+        <meta charset="utf-8"></meta>
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width"></meta>
+        <apex:stylesheet value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/exam/css/bootstrap.min.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/exam/css/main.min.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/exam/css/font-awesome.min.css')}"/>
+        
+     
+
+    </head>
+
+
+    <div>
+    <apex:outputLink value="{! $Page.innovationreviews}">Click here to review applications</apex:outputLink>
+        </div>
+    <div class="container">
+        <div ng-app="innovatorGrants">
+            <div ng-controller="applicationsCtrl">
+                <div class="" role="form">
+                    <div class="row pill-box">
+                        <div class="col-xs-12">
+                            <ul class="nav nav-pills ">
+                                <li class="active">
+                                    <a href="javascript:" ng-click="setTab(1)">
+                                        My Applications</a>
+                                </li>
+                                <li class="inactive">
+                                    <a href="javascript:" ng-click="newApp()">Create New Application</a>
+
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel" id="resultList" ng-show="applications">
+
+                        <div class="row" ng-if="applications.length == 0">
+                            <div class="col-xs-12 col-sm-4">
+                                <h4>You have no applications created</h4>
+                            </div>
+                        </div>
+                        <div class="row" ng-if="applications.length > 0">
+                            <div class="col-xs-12 table-wrap">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <td>
+                                                <a href="javascript:" ng-click="sortType = 'Exam_Name__c'; sortReverse = !sortReverse">Application Name
+                                                    <span ng-show="sortType == 'Exam_Name__c' && sortReverse" class="fa fa-caret-down"></span>
+                                                    <span ng-show="sortType == 'Exam_Name__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:" ng-click="sortType = 'ExAM__Assessment_Template_Type__c'; sortReverse = !sortReverse">Application Type
+                                                    <span ng-show="sortType == 'ExAM__Assessment_Template_Type__c' && sortReverse" class="fa fa-caret-down"></span>
+                                                    <span ng-show="sortType == 'ExAM__Assessment_Template_Type__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:" ng-click="sortType = 'ExAM__Location__c'; sortReverse = !sortReverse">Location
+                                                    <span ng-show="sortType == 'ExAM__Location__c' && sortReverse" class="fa fa-caret-down"></span>
+                                                    <span ng-show="sortType == 'ExAM__Location__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:" ng-click="sortType = 'ExAM__Investigation_Type__c'; sortReverse = !sortReverse">Category
+                                                    <span ng-show="sortType == 'ExAM__Investigation_Type__c' && sortReverse" class="fa fa-caret-down"></span>
+                                                    <span ng-show="sortType == 'ExAM__Investigation_Type__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:" ng-click="sortType = 'ExAM__Status__c'; sortReverse = !sortReverse">Status
+                                                    <span ng-show="sortType == 'ExAM__Status__c' && sortReverse" class="fa fa-caret-down"></span>
+                                                    <span ng-show="sortType == 'ExAM__Status__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:" ng-click="sortType = 'ExAM__Assessment_Date_Time__c'; sortReverse = !sortReverse">Last Modified
+                                                    <span ng-show="sortType == 'ExAM__Assessment_Date_Time__c' && sortReverse" class="fa fa-caret-down"></span>
+                                                    <span ng-show="sortType == 'ExAM__Assessment_Date_Time__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                                </a>
+
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="field in applications | orderBy:sortType:sortReverse">
+                                            <td>
+                                                <a href="{{ field.grantUrl }}">{{ field.Exam_Name__c }}</a>
+                                            </td>
+                                            <td>{{ field.ExAM__Assessment_Template_Type__c }}</td>
+                                            <td>{{ field.ExAM__Location__c }}</td>
+                                            <td>{{ field.ExAM__Investigation_Type__c }}</td>
+                                            <td>{{ field.ExAM__Status__c }}</td>
+                                            <td>{{ field.ExAM__Assessment_Date_Time__c | date: 'MM/dd/yyyy @ h:mma'}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <input type="hidden" ng-model="sessionId" ng-init="sessionId='{!$Api.Session_ID}'"></input>
+                <input type="hidden" ng-model="userId" ng-init="userId='{!$User.id}'"></input>
+                <input type="hidden" ng-model="url" ng-init="url='{!$CurrentPage.Url}'"></input>
+
+
+            </div>
+        </div>
+    </div>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/select-tpls.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/app.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/controllers.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/services.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/directives.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular-scroll.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/ui-bootstrap-tpls-2.0.1.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular-base64-upload.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/Blob.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/FileSaver.min.js  ')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular-file-saver.min.js')}"/>
+</apex:page>

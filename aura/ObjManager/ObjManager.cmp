@@ -1,0 +1,72 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
+
+    <!--<aura:handler name="change" value="{!v.assessementId}" action="{!c.doInit}"/>-->
+    <ltng:require styles="{!$Resource.fontawesome + '/font-awesome/css/font-awesome.css'}"/>
+    <aura:handler name="SettingSelectedTab" event="c:SettingSelectedTab" action="{!c.changeTemplateAction}"/>
+    <aura:handler name="ObjLoadEvt" event="c:ObjLoadEvt" action="{!c.ObjLoadEvt}"/>
+    <aura:handler name="updateFields" event="c:updateFieldEvt" action="{!c.refreshData}"/>
+    <aura:attribute name="hasName" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="ObjName" type="String" access="public"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="showNavTab" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="SectionTemplates" type="Section_Template__c[]" access="public"/>
+    <aura:attribute name="ObjTemplate" type="IssueRequest_Life_Cycle__c" access="public"/>
+    <aura:attribute name="ObjId" type="String" access="public"/>
+    <aura:attribute name="linkDestination" type="string" access="public"/>
+    <aura:attribute name="countQuestion" type="Integer" access="public"/>
+    <aura:attribute name="fields" type="Map" access="public"/>
+    <aura:attribute name="attachment" type="Map" default="{Name : '', Id : '', ContentType : ''}" access="public"/>
+    <aura:attribute name="oldObjId" type="String" access="public"/>
+    <aura:attribute name="isNew" type="Boolean" access="public" default="false"/>
+    <aura:attribute name="attachments" type="Map" access="public"/>
+    <aura:attribute name="objLabel" type="String" access="public" default="Innovation Grant"/>
+    <aura:attribute name="objApi" type="String" access="public" default="Innovation_Grant__c"/>
+
+    <aura:registerEvent name="notificationEvent" type="c:NotificationEvt"/>
+
+    <c:NotificationCmp />
+    <div class="slds-p-around--medium">
+        <div class="slds-m-vertical--large">
+            <h1 class="slds-text-heading--large ">
+                <a class="" onclick="{!c.navigateToObjTable}">My {!v.objLabel}s</a>
+                <aura:if isTrue="{!v.hasName}">
+                    > {!v.ObjTemplate.Issue_request__c}
+                </aura:if>
+            </h1>
+        </div>
+
+        <aura:if isTrue="{!v.showNavTab}">
+            <article aura:id="examManage">
+                <div class="section-header">
+                    <c:TabContainer wrapperClass="slds-tabs--scoped "
+                                    ulClass="slds-tabs--scoped__nav "
+                                    liClass="slds-text-heading--label slds-tabs--scoped__item"
+                                    aClass="slds-tabs--scoped__link"
+                                    accList="[
+                                             {name:'Details', componentLink: 'ObjOptions', active:true},
+                                             {name:'Application', componentLink: 'ObjViewExam'}
+                                             ]"/>
+                </div>
+                <div class="section-body">
+                    <div class="templateActions" aura:id="templateActions"></div>
+                </div>
+            </article>
+            <aura:set attribute="else">
+                <div aura:id="ObjTable" class="slds-show">
+                    <c:ObjTable aura:id="Obj" ObjTemplate="{!v.ObjTemplate}"  objLabel="{!v.objLabel}" objApi="{!v.objApi}" />
+                </div>
+            </aura:set>
+        </aura:if>
+
+    </div>
+    <aura:if isTrue="{!v.showSpinner}">
+        <div class="slds-spinner_container spinnerFixed">
+            <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+
+</aura:component>

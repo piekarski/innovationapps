@@ -1,0 +1,122 @@
+<apex:page controller="DecisionTreeController" sidebar="false" showHeader="false" standardStylesheets="false" applyHtmlTag="false" applyBodyTag="false" >
+<apex:includeScript value="{!URLFOR($Resource.jQueryFiles, 'jquery.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.jQueryFiles, 'jquery-ui.min.js')}"/>
+
+
+    <apex:stylesheet value="{!URLFOR($Resource.styles_myva ,'myva_main.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.styles_myva ,'bootstrap.min.css')}"/>
+
+    <script>
+        function CloseAndRedirect(){
+          window.parent.closeIframe();
+          return false;
+        }
+    </script>
+
+
+    <script>
+       function requiredValidate(btntype,secId) {
+            var errorFlag = false;
+           $('.validateradio').each(function() {
+                $(this).addClass('currentRadio');
+                if($('.currentRadio input[type=radio]:checked').length == 0) {
+                    $( this ).parent().next('div').css('display','');
+                    errorFlag = true;
+                } else {
+                    $( this ).parent().next('div').css('display','none');
+                }
+                $(this).removeClass('currentRadio');
+            });
+
+            if (!errorFlag) {
+                submitbtn();
+                }
+            }
+    </script>
+    <style>
+    .multiselect td {
+      display: block;
+      font-weight: normal;
+    }
+    .multiselect td label{
+      font-weight: normal;
+    }
+    label {
+    display: inline;
+    }
+    td{
+      margin-bottom: 5px;
+    }
+    .container{
+      width: 100%;
+    }
+    </style>
+    <div class="container decisionTreeDialog">
+        <apex:form >
+            <apex:pageMessages ></apex:pageMessages>
+            <div class="form-group">
+                <fieldset>
+                        <div style="padding-left:2%;padding-right:2%;">
+                            <apex:outputPanel styleClass="multiselect" id="topPanel" rendered="{!IF((questionTemp.ExAM__Question_Label__c != null && questionTemp.ExAM__Question_Label__c !=''),true, false)}">
+<script>
+$(document).ready(function(){
+    $(this).scrollTop(0);
+});
+
+</script>
+                                <!-- This section is used for NCA Survey Answers -->
+                                <apex:outputPanel rendered="{!(questionTemp.ExAM__Question_Type__c=='MultiselectPicklist')}">
+                                    <apex:outputField value="{!questionTemp.ExAM__Question_Label__c}"></apex:outputField>  <br/>
+                                        <apex:selectCheckboxes style="padding-right:5px;" value="{!MultiAnswers}">
+                                            <apex:selectOptions value="{!answerOption}" ></apex:selectOptions>
+                                        </apex:selectCheckboxes>
+                                         <div class="errorMsg" style="display:none;">
+                                        <span style="color:Red;">Please select an answer</span>
+                                        </div>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!(questionTemp.ExAM__Question_Type__c=='RadioPicklist' && questionTemp.ExAM__HelpText__c!='Dropdown')}">
+                                    <apex:outputField value="{!questionTemp.ExAM__Question_Label__c}"></apex:outputField>  <br/>
+                                            <apex:selectRadio style="padding-right:5px;" styleClass="validateradio" value="{!questionRes.ExAM__Response__c}">
+                                                <apex:selectOptions value="{!answerOption}" ></apex:selectOptions>
+                                            </apex:selectRadio>
+                                             <div class="errorMsg" style="display:none;">
+                                                <span style="color:Red;">Please select an answer</span>
+                                            </div>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!(questionTemp.ExAM__Question_Type__c=='RadioPicklist' && questionTemp.ExAM__HelpText__c=='Dropdown')}">
+                                    <apex:outputField value="{!questionTemp.ExAM__Question_Label__c}"></apex:outputField>  <br/>
+                                    <apex:selectList value="{!questionRes.ExAM__Response__c}" multiselect="false" size="1">
+                                        <apex:selectOptions value="{!answerOption}"></apex:selectOptions>
+                                    </apex:selectList>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!(questionTemp.ExAM__Question_Type__c=='Result')}">
+                                <!-- This section is used for NCA Survey Comment Page -->
+                                    <apex:outputField value="{!questionTemp.ExAM__Question_Label__c}"></apex:outputField>  <br/> <br/>
+                                    <table cellpadding="10">
+                                        <apex:repeat value="{!resultPageFieldsList}" var="fieldapi">
+                                            <tr>
+                                                <td style="text-align: right;padding-right: 10px;">
+                                                  <!--<apex:outputLabel >{!fieldAPIWithLabel[fieldapi]} </apex:outputLabel>-->
+                                                </td>
+                                                <td style="padding-bottom: 10px;">
+                                                    <apex:inputField value="{!questionRes[fieldapi]}"/>
+                                                </td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </table>
+                                </apex:outputPanel>
+                                <br/>
+                                <div class="button-wrap">
+                                <apex:commandButton value="Previous" action="{!previousQuestion}" rendered="{!isPreviousQuestion}" reRender="topPanel"/>
+                                <apex:commandButton value="Save & Next" onclick="requiredValidate('save',''); return false;" rendered="{!questionTemp.ExAM__Question_Type__c!='Result'}" />
+                                <apex:commandButton value="Submit" styleclass="submit" action="{!completedAssessments}" oncomplete="CloseAndRedirect()" rendered="{!questionTemp.ExAM__Question_Type__c == 'Result'}"/>
+                                <apex:commandButton value="Cancel" onclick="window.parent.closeIframe(); return false;" reRender="topPanel"/>
+                                </div>
+                                 <apex:actionFunction name="submitbtn" action="{!saveAnswer}" reRender="topPanel" />
+                            </apex:outputPanel>
+                        </div>
+                </fieldset>
+            </div>
+        </apex:form>
+    </div>
+</apex:page>

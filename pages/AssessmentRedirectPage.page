@@ -1,0 +1,11 @@
+<apex:page sidebar="false" showHeader="false"> 
+
+  <br/><br/><br/><br/>
+  <!--<center> <h1> <font color="red"> Should add appropriate contents here</font></h1> </center>-->
+  <table width="100%" style="border-bottom: 3px solid #00335b;border-top-width:30px;padding-bottom:0px;padding-right:5%;padding-left:5%;">
+     <tr><td width="10px"><apex:image url="{!$Resource.MyVAsmall}" width="198" height="71"/></td></tr>
+    </table>
+   
+  <br/><br/>
+  <center> <h1>Thank you for providing VA leadership with your valuable feedback!</h1></center>
+</apex:page>

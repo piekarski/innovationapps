@@ -1,0 +1,1 @@
+<aura:event access="public" type="APPLICATION" description="Event template" />

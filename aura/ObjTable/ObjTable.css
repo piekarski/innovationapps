@@ -1,0 +1,12 @@
+.THIS{
+
+}
+.THIS .uiLabel-left{
+  display: inline-block;
+}
+.THIS th{
+  cursor: pointer;
+}
+.THIS .slds-icon-action-edit {
+    background-color: #ffb75d;
+}

@@ -1,0 +1,25 @@
+<apex:page >
+  <!-- Begin Default Content REMOVE THIS -->
+  <hr color="#88180F" size="3px"></hr>
+
+<h1>MyVA Survey Metrics and Questions</h1>
+<br></br>
+<br>
+(Q.9)   <strong>Value</strong> employees feel</br>
+<br>
+“I feel valued for the work that I do.”
+ </br>
+<br>
+(Q.10) <strong>Customer</strong> satisfaction</br>
+<br>
+“Customers are satisfied with the products and services I provide.”
+ </br>
+<br>
+(Q.11) <strong>Mission</strong> accomplishment</br>
+
+<br>
+“I am fulfilling our country’s commitment to serving Veterans.”
+ </br>
+
+  <!-- End Default Content REMOVE THIS -->
+</apex:page>

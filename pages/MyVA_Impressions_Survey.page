@@ -1,0 +1,9 @@
+<apex:page sidebar="true" standardController="account">
+          
+    <wave:dashboard dashboardId="0FKt0000000GmjBGAS" 
+          showTitle="true" 
+          height="1500px" 
+          openLinksInNewWindow="false" 
+          filter="{'service': {'account': ['{!Account.Name}'],'industry': ['{!Account.Name}']}}" />
+          
+</apex:page>

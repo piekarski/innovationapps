@@ -1,0 +1,88 @@
+<aura:component controller="ExamFieldEditorController">
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:attribute name="textValNew" type="String" access="public"/>
+    <aura:attribute name="boolValNew" type="Boolean" access="public"/>
+    <aura:attribute name="numberValNew" type="Double" access="public"/>
+    <aura:attribute name="dateValNew" type="Date"/>
+    <aura:attribute name="dateTimeValNew" type="DateTime"/>
+
+    <aura:attribute name="showSpinner" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="AnswerOptions" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="textValOld" type="String" access="public"/>
+    <aura:attribute name="boolValOld" type="Boolean" access="public"/>
+    <aura:attribute name="numberValOld" type="Integer" access="public"/>
+    <aura:attribute name="dateValOld" type="Date"/>
+    <aura:attribute name="dateTimeValOld" type="DateTime"/>
+
+    <aura:attribute name="fieldLabel" type="String" access="public"/>
+    <aura:attribute name="fieldName" type="String" access="public"/>
+    <aura:attribute name="valType" type="String" access="public"/>
+    <aura:attribute name="options" type="List" access="public"/>
+    <aura:attribute name="Id" type="String" access="public"/>
+    <aura:attribute name="sObjectAPI" type="String" access="public"/>
+    <aura:attribute name="editable" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="record" type="Map" access="public"/>
+    <aura:attribute name="attachment" type="Map" access="public"/>
+
+    <aura:attribute name="editView" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="search" type="Boolean" default="false" access="public"/>
+
+    <aura:registerEvent name="updateFields" type="c:updateFieldEvt"/>
+
+
+    <aura:method name="upsertAnswer" action="{!c.updateFieldValue}" access="public">
+        <aura:attribute name="value" type="String" access="public"/>
+    </aura:method>
+
+    <aura:if isTrue="{!v.showSpinner}">
+        <div class="slds-spinner_container">
+            <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.fieldLabel != null}">
+      <span class="slds-m-right--small">{!v.fieldLabel}</span>
+    </aura:if>
+
+
+    <aura:if isTrue="{!v.editView}">
+        <div class="slds-size--12-of-12">
+            <span aura:id="createInputCmp" class="slds-size--8-of-12" >
+
+            </span>
+
+
+            <span class="slds-p-around--xx-small slds-size--2-of-12">
+                <a class="slds-float--right" onclick="{!c.updateFieldValue}">
+                    <lightning:icon iconName="utility:check" size="xx-small" alternativeText="Update Field"/>
+                </a>
+            </span>
+            <span class="slds-p-around--xx-small slds-size--2-of-12">
+                <a class="slds-float--right" onclick="{!c.cancelUpdateFieldVal}">
+                    <lightning:icon iconName="utility:refresh" size="xx-small" alternativeText="Indicates revert"/>
+                </a>
+            </span>
+        </div>
+        <aura:set attribute="else">
+
+            <span aura:id="createOutputCmp">
+
+            </span>
+
+            <aura:if isTrue="{!v.editable}">
+                <a href="" class="slds-float--right" onclick="{!c.changevalue}">
+                    <lightning:icon iconName="utility:edit" size="xx-small" alternativeText="Click to Edit"/>
+                </a>
+            </aura:if>
+
+        </aura:set>
+
+    </aura:if>
+
+</aura:component>

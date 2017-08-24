@@ -1,0 +1,27 @@
+<aura:component extends="c:examFieldBase">
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+  <aura:attribute name="oldValue" type="String" access="public"/>
+  <aura:attribute name="newValue" type="String" access="public"/>
+  <div class="slds-grid slds-wrap slds-grid--align-spread slds-grid--vertical-align-center">
+    <a class="slds-col exam-bold label-override" onclick="{!c.changevalue}">
+      {!v.fieldLabel}
+    </a>
+    <span aura:id="createOutputCmp">
+      <input type="color" aura:id="color" value="{!v.newValue}" disabled="{!v.defaultMode == 'view'}"/>
+    </span>
+    <aura:if isTrue="{!v.editMode}">
+
+      <aura:set attribute="else">
+        <span class="slds-col slds-p-vertical--x-small">
+          <a class="slds-button slds-button--neutral slds-button--save slds-m-right--small" onclick="{!c.updateFieldValue}">
+            Update
+          </a>
+          <a class="slds-button slds-button--neutral" onclick="{!c.cancelUpdateFieldVal}">
+            Cancel
+          </a>
+        </span>
+      </aura:set>
+    </aura:if>
+  </div>
+</aura:component>

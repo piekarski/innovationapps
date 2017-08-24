@@ -1,0 +1,205 @@
+<apex:page sidebar="false" showHeader="true" title="VA Analytics"  id="thePage" language="en" applyHtmlTag="true">
+    <head>
+        <c:remoetk ></c:remoetk>
+
+        <meta charset="utf-8"></meta>
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width"></meta>
+        <apex:stylesheet value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/angular/jqcloud.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/exam/css/bootstrap.min.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/exam/css/main.min.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/exam/css/select.min.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/exam/css/font-awesome.min.css')}"/>
+
+    </head>
+
+    <div ng-app="analyticsDashboard">
+        <div ng-controller="appCtrl" ng-init="dashId =''">
+            <div class="form-horizontal" role="form">
+                <div class="panel">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <ul class="nav nav-pills ">
+                                <li ng-class="{ active: isSet(1) }">
+                                    <a href="javascript:" ng-click="setTab(1)">
+                                        APG Dashboard</a>
+                                </li>
+                                <li ng-class="{ active: isSet(2) }">
+                                    <a href="javascript:" ng-click="setTab(2)">
+                                        APG Word Cloud</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="isSet(1)" class="waveDashboard">
+                <div class="form-horizontal" role="form">
+                    <div class="panel">
+                        <div class="row">
+                            <div class="col-xs-12 " ng-hide="dashId">
+                                Please add a WAVE Dashboard
+                            </div>
+
+                            <div class="col-xs-12" ng-show="dashId">
+                                <wave:dashboard dashboardId="{!$Label.Wave_Dashboard_ID}" height="1000px" showTitle="true" openLinksInNewWindow="true"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-controller="cloudCtrl" ng-show="isSet(2)" class="cloudCtrl">
+                <div class="form-horizontal" role="form">
+                    <div class="panel">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-4">
+                                <label>Minimum Word Frequency</label>
+                                <input class="form-control minFreq" ng-model="labelParams.minWordFrequency"></input>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-4">
+                                <oi-select oi-options="key as value for (key , value) in filterTypes" ng-change="resetBundle()" ng-model="filterType" placeholder="Filter Word Cloud">APG ExAM ExAM
+                                </oi-select>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="filterType == 'Administration__c'">
+                            <div class="col-xs-12 col-sm-4">
+                                <oi-select oi-options="key as value for (key , value) in filterOptionAdmin" multiple="true" ng-model="adminBundle" placeholder="Select Administrations"></oi-select>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="filterType == 'Service__c'">
+                            <div class="col-xs-12 col-sm-4">
+                                <oi-select oi-options="key as value for (key , value) in filterOptionLocation" multiple="true" ng-model="serviceBundle" placeholder="Select Services"></oi-select>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-xs-12 col-sm-4 ">
+                                <button class="btn btn-primary" ng-click="filter()">Load Word Cloud</button>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6">
+                                <p class="alert alert-danger" ng-if="resultsWarning">{{resultsWarning}}</p>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <uib-progressbar ng-if="isBar" class="progress-striped active" animate="true" value="progress" type="success">
+                                    <b>{{progress}}%</b>
+                                </uib-progressbar>
+                                <div style="display:none;" class="maskDiv">
+                                    <div style="display:none;" class="large spinner">
+                                        <div>Loading…</div>
+                                    </div>
+                                </div>
+                                <jqcloud ng-show="isCloud" words="words" id="cloud-dynamic" auto-resize="false" steps="4" delay="2" colors="{{cloudColors}}" font-size="{{cloudWords}}"></jqcloud>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel" id="resultList" ng-show="commentList">
+
+                        <div class="row">
+
+                            <div class="col-xs-12 col-sm-4">
+                                <h3>{{commentCount}} Comments Retrieved</h3>
+                                <input type="text" class="form-control" placeholder="Filter Results" ng-model="search"></input>
+
+                            </div>
+                        </div>
+                        <table class="table table-bordered table-striped">
+
+                            <thead>
+                                <tr>
+                                    <td>
+                                        <a href="javascript:" ng-click="sortType = 'Name'; sortReverse = !sortReverse">Name
+                                            <span ng-show="sortType == 'Name' && sortReverse" class="fa fa-caret-down"></span>
+                                            <span ng-show="sortType == 'Name' && !sortReverse" class="fa fa-caret-up"></span>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:" ng-click="sortType = 'Location_of_Service__c'; sortReverse = !sortReverse">Location
+                                            <span ng-show="sortType == 'Location_of_Service__c' && sortReverse" class="fa fa-caret-down"></span>
+                                            <span ng-show="sortType == 'Location_of_Service__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                        </a>
+
+                                    </td>
+                                    <td>
+                                        <a href="javascript:" ng-click="sortType = 'Administration__c'; sortReverse = !sortReverse">Admin
+                                            <span ng-show="sortType == 'Administration__c' && sortReverse" class="fa fa-caret-down"></span>
+                                            <span ng-show="sortType == 'Administration__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                        </a>
+
+                                    </td>
+                                    <td>
+                                        <a href="javascript:" ng-click="sortType = 'Gender__c'; sortReverse = !sortReverse">Gender
+                                            <span ng-show="sortType == 'Gender__c' && sortReverse" class="fa fa-caret-down"></span>
+                                            <span ng-show="sortType == 'Gender__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                        </a>
+
+                                    </td>
+                                    <td>
+                                        <a href="javascript:" ng-click="sortType = 'Age__c'; sortReverse = !sortReverse">Age
+                                            <span ng-show="sortType == 'Age__c' && sortReverse" class="fa fa-caret-down"></span>
+                                            <span ng-show="sortType == 'Age__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                        </a>
+
+                                    </td>
+                                    <td>
+                                        <a href="javascript:" ng-click="sortType = 'Service_Date__c'; sortReverse = !sortReverse">Service Date
+                                            <span ng-show="sortType == 'Service_Date__c' && sortReverse" class="fa fa-caret-down"></span>
+                                            <span ng-show="sortType == 'Service_Date__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                        </a>
+
+                                    </td>
+                                    <td>
+                                        <a href="javascript:" ng-click="sortType = 'Comment__c'; sortReverse = !sortReverse">Comment
+                                            <span ng-show="sortType == 'Comment__c' && sortReverse" class="fa fa-caret-down"></span>
+                                            <span ng-show="sortType == 'Comment__c' && !sortReverse" class="fa fa-caret-up"></span>
+                                        </a>
+
+                                    </td>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="field in commentList | orderBy:sortType:sortReverse | filter:search">
+                                    <td>{{ field.Name }}</td>
+                                    <td>{{ field.Location_of_Service__c }}</td>
+                                    <td>{{ field.Administration__c }}</td>
+                                    <td>{{ field.Gender__c }}</td>
+                                    <td>{{ field.Age__c }}</td>
+                                    <td>{{ field.Service_Date__c }}</td>
+                                    <td>{{ field.Comment__c }}</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+                <input type="hidden" ng-model="labelParams.skipwords" ng-init="labelParams.skipwords ='{!$Label.Wordcloud_Skipwords}'"/>
+                <input type="hidden" ng-model="labelParams.minWordFrequency" ng-init="labelParams.minWordFrequency = {!$Label.Wordcloud_MinWordFrequency}"/>
+
+            </div>
+        </div>
+    </div>
+    <apex:includeScript value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/angular/jquery.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/angular/angular.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/angular/angular-jqcloud.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/angular/select-tpls.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/js/app.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/js/controllers.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/js/services.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/js/directives.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/angular/jqcloud.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/angular/angular-scroll.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AnalyticsDashboardSurvey ,'www/lib/angular/ui-bootstrap-tpls-2.0.0.min.js')}"/>
+    <script type="text/javascript">
+
+        Visualforce.remoting.timeout = 120000; // Set timeout at page level
+    </script>
+</apex:page>

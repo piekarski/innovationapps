@@ -1,0 +1,9 @@
+<apex:page sidebar="false" showHeader="false"> 
+  <!--<center> <h1> <font color="red"> Should add appropriate contents here</font></h1> </center>-->
+  <table width="100%" style="border-bottom: 3px solid #00335b;padding-bottom:10px;padding-right:5%;padding-left:5%;">
+     <tr><td><apex:image url="{!$Resource.NCALogo}" width="175" height="153"/></td></tr>
+    </table>
+   
+  <br/><br/>
+  <center> <h1>Sucessfully submitted the Survey</h1></center>
+</apex:page>

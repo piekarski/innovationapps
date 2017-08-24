@@ -1,0 +1,16 @@
+<apex:page sidebar="false" standardStylesheets="true" showHeader="true" tabStyle="Agent_Entry_Page__tab">
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap_namespaced)}" />
+    <body>             
+            <div class="bootstrap-wrapper">
+                <ul class="nav nav-tabs">
+                  <li role="presentation"><apex:outputLink value="Entry_Page_Agent_Production"><h5><b>Agent Production</b></h5></apex:outputLink></li>
+                  <li role="presentation"><apex:outputLink value="Entry_Page_Excluded_Request"><h5><b>Excluded Request</b></h5></apex:outputLink></li>
+                  <li role="presentation" class="active"><apex:outputLink value="Entry_Page_Leave_Request"><h5><b>Leave Request</b></h5></apex:outputLink></li>
+                  <li role="presentation"><apex:outputLink value="Entry_Page_IRIS_Production"><h5><b>IRIS Production</b></h5></apex:outputLink></li>
+                </ul>                                                
+                <flow:interview name="LeaveRequest" buttonLocation="bottom" buttonStyle="color:#fff; background-color:#1882ed; border:1px solid;"/>                                                                                                 
+                <h3>Leave Request History</h3>                                                                                                                                             
+            </div>
+            <apex:enhancedList type="VBA_CC_Tracking_Leave_Manager__c" height="500" rowsPerPage="50" id="IRISList" />       
+    </body>    
+</apex:page>

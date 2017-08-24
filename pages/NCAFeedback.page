@@ -1,0 +1,228 @@
+<apex:page sidebar="false" showHeader="false" standardController="ExAM__Main_questionaire__c" extensions="NCACustomerFeedbackController"  recordSetVar="sitem" id="thePage" standardStylesheets="true" tabStyle="ExAM__IssueRequest_Life_Cycle__c" title="{!$CurrentPage.parameters.templatename}" language="en" docType="html-5.0">  
+<title>{!templatename}</title>
+<meta name="viewport" content="width=device-width-5, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes;"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11" />
+<apex:stylesheet value="{!URLFOR($Resource.Datepicker,'Datepicker/jquery-ui.min.css')}"/>
+<apex:includeScript value="{!URLFOR($Resource.Datepicker,'Datepicker/jquery-1.10.2.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.Datepicker,'Datepicker/jquery-ui.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.jQueryFiles, 'jquery.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.jQueryFiles, 'jquery-ui.min.js')}"/>
+       
+
+<script language="JavaScript" type="text/javascript"> 
+    
+    function showSimpleDialog(){    
+       
+       var sd = new SimpleDialog("Test"+Dialogs.getNextId(), false);    
+       sd.setTitle("Introduction to NCA Survey");   
+       sd.createDialog();   
+       window.parent.sd = sd;   
+        sd.setContentInnerHTML("<p><b>Completing the Survey</b><br /><br /> The following Survey includes six (6) questions.<br /><br />The first question identifies the NCA Service Line.<br /><br />Then, thinking about your internal customer service experience, please tell us how you feel about the following statements (on a 5pt scale from strongly disagree to strongly agree).<br /><br />You are encouraged to complete one survey for each NCA Service Line where you may have had an interaction.<br /><br />To complete more than one survey, select “Save & Continue” at the bottom of the page to submit the survey response and continue on with the next survey.<br /><br />Select a different NCA Service Line for each survey submission.<br /><br />Click “Save & Exit” to close the survey.<br /><br /> Please Note: You may not rate the same support office more than one time within a 24 hour period.<br/><br/><br/><b>Confidentiality Statement</b><br /><br />The NCA Internal Customer Satisfaction Survey is completely anonymous.<br /><br />We do not capture personal user information other than certain IP Address information to safeguard data integrity and prevent against multiple survey submissions by the same individual for the same experience. </p><p align='center'><br /><button class='btn' onclick='window.parent.sd.hide(); return false;'>Get Started</button></p>");    
+       sd.show();   
+     }  
+    showSimpleDialog(); 
+    
+    </script>
+    
+<apex:form id="templateForm" style="bgcolor:#EEEEEE;font-size:14px" >
+    <apex:actionFunction name="callSaveJS" action="{!save}"/>
+        
+<script language="JavaScript" type="text/javascript">
+function function1()
+{
+    callSaveJS();
+}
+</script> 
+    
+    <apex:inputHidden id="hdIssueId"  value="{!issueId}"/>
+    <table width="100%" style="border-bottom: 2px solid #00335b;border-top-width:30px;padding-bottom:0px;padding-right:5%;padding-left:5%;">
+     <tr><td width="10px"><apex:image url="{!$Resource.VAHeaderSurveyLogo}" width="250" height="48"/></td>
+     <td style="text-align:center;padding-right:50px;font-size:25px;"><b>{!templatename} Survey</b></td></tr>
+    </table> 
+    <table width="100%" style="padding-left:5%;padding-right:5%;">
+            <tr>
+             <td  colspan="2" valign="top">             
+              <apex:outputPanel id="questiondetail">                   
+              <apex:pageBlock id="block1"> 
+              <apex:pageMessages id="showmsg"></apex:pageMessages>
+              <apex:pageBlockButtons location="bottom" id="buttons1" > 
+                  <apex:commandButton id="btnExit" value="Exit" action="{!Cancel}" reRender="none" style="background-color:#ff3333;color: white; background-image:none;width:100px;" /> 
+                  <apex:commandButton id="button2" value="I'm Completely Done - Save and Exit" onclick="requiredValidate('button','');" reRender="none" style="background-color:#ff5c33;color: white; background-image:none;width:250px;" /> 
+                  <apex:commandButton id="button3" value="I Would Like to Submit Another Survey" onclick="requiredValidate('continuebutton','');" reRender="thePage" style="background-color:#00b300;color: white; background-image:none;width:250px;"/> 
+                  
+                <apex:actionFunction name="saveAnswerBtn" action="{!save}" reRender="showmsg" oncomplete="window.scrollTo(0,0);" >
+                     <apex:param name="doRerenderSave" value="true" assignTo="{!doRerenderSave}"/>
+                     <apex:param name="saveType" value="button"/>                
+                </apex:actionFunction>
+                  
+                <apex:actionFunction name="saveContinueBtn" action="{!save}" reRender="showmsg" oncomplete="window.scrollTo(0,0);" >
+                     <apex:param name="doRerenderSave2" value="true" assignTo="{!doRerenderSave2}"/>
+                     <apex:param name="saveType" value="continueButton"/>
+                </apex:actionFunction>
+                               
+                <apex:actionFunction name="SaveAns" action="{!save}" reRender="{!$Component.thePage.templateForm.questiondetail}, pgBlock">
+                    <apex:param name="sectionId" value=""/>
+                    <apex:param name="doRerender" value="true" assignTo="{!doRerender}"/>
+                    <apex:param name="doRerenderSave2" value="true" assignTo="{!doRerenderSave}"/>
+                    <apex:param name="saveType" value="menu"/>
+                </apex:actionFunction>             
+              
+              </apex:pageBlockButtons> 
+               
+              <apex:variable var="qnum" value="{!1}"/>                    
+              
+              <apex:repeat value="{!questionsList}" var="question" > 
+                           
+                   <apex:pageBlockSection columns="1" rendered="{!question.newquestFormat.ExAM__Question_Type__c=='Text'}" >
+                      <apex:outputPanel rendered="{!NOT(ISNULL(question.newquestFormat.ExAM__HelpText__c))}"><b>Q.{!qnum} {!question.newquestFormat.ExAM__Question_Label__c}</b><span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.ExAM__HelpText__c}"/></span>
+                      </apex:outputPanel>
+                      <apex:outputPanel rendered="{!ISNULL(question.newquestFormat.ExAM__HelpText__c)}"><b>Q.{!qnum} {!question.newquestFormat.ExAM__Question_Label__c}</b>
+                      </apex:outputPanel>
+                       <!-- <apex:outputPanel rendered="{!question.newquestFormat.HelpText__c==null}" ><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c} </b> <span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                       </apex:outputPanel>-->
+                       <apex:pageBlockSectionItem dataStyle="padding-left:30px;" >  
+                            <!--<apex:outputField value="{!question.newquestFormat.Question_Label__c}" />-->
+                            <apex:outputPanel >
+                                <apex:outputField value="{!question.newquestFormat.ExAM__Subquestion_Label__c}" />              
+                                <div class="{!IF(question.newquestFormat.ExAM__Is_mandatory__c,'requiredInput','')}">
+                                    <div class="requiredBlock"></div>
+                                    <apex:inputText styleClass="validate{!question.newquestFormat.ExAM__Is_Mandatory__c}" style="width:100%" id="textInf" value="{!question.resObj.ExAM__Response__c}" maxlength="1000" />
+                                    <div class="errorMsg" style="display:none;">
+                                        <strong>Error:</strong> 
+                                        You must enter a value 
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>  
+                   </apex:pageBlockSection>
+                 <apex:pageBlockSection columns="1" rendered="{!question.newquestFormat.ExAM__Question_Type__c=='Textarea'}" >
+                       <apex:outputPanel rendered="{!NOT(ISNULL(question.newquestFormat.ExAM__HelpText__c))}"><b>Q.{!qnum} {!question.newquestFormat.ExAM__Question_Label__c}</b><span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.ExAM__HelpText__c}"/></span>
+                      </apex:outputPanel>
+                      <apex:outputPanel rendered="{!ISNULL(question.newquestFormat.ExAM__HelpText__c)}"><b>Q.{!qnum} {!question.newquestFormat.ExAM__Question_Label__c}</b>
+                      </apex:outputPanel>
+                       <!-- <apex:outputPanel rendered="{!question.newquestFormat.HelpText__c==null}" ><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c} </b> <span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                       </apex:outputPanel>-->
+                       <apex:pageBlockSectionItem dataStyle="padding-left:30px;" >  
+                            <!--<apex:outputField value="{!question.newquestFormat.ExAM__Question_Label__c}" />-->
+                            <apex:outputPanel >
+                            <apex:outputField value="{!question.newquestFormat.ExAM__Subquestion_Label__c}" />              
+                            <div class="{!IF(question.newquestFormat.ExAM__Is_mandatory__c,'requiredInput','')}">
+                                <div class="requiredBlock"></div> 
+                                <apex:inputTextarea styleClass="validate{!question.newquestFormat.ExAM__Is_Mandatory__c}" style="width:100%;" rows="6"  id="textInfo" value="{!question.resObj.ExAM__Response__c}"></apex:inputTextArea>
+                                <div class="errorMsg" style="display:none;">
+                                    <strong>Error:</strong> 
+                                    You must enter a value 
+                                </div>
+                            </div>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                   </apex:pageBlockSection>
+                 <apex:pageBlockSection columns="1" rendered="{!(question.newquestFormat.ExAM__Question_Type__c=='RadioPicklist' && question.newquestFormat.ExAM__HelpText__c=='Dropdown')}">
+                       <apex:outputPanel rendered="{!NOT(ISNULL(question.newquestFormat.ExAM__HelpText__c))}" style="text-align:center;font-size:1.1em" ><b>Q.{!qnum} {!question.newquestFormat.ExAM__Question_Label__c}</b><span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.ExAM__HelpText__c}"/></span>
+                       </apex:outputPanel>
+                        <apex:outputPanel rendered="{!ISNULL(question.newquestFormat.ExAM__HelpText__c)}" style="text-align:center;font-size:1.1em" ><b>Q.{!qnum} {!question.newquestFormat.ExAM__Question_Label__c}</b>
+                      </apex:outputPanel>
+                       <apex:pageBlockSectionItem >  
+                               <!--<apex:selectRadio layout="pageDirection" id="qOptionList">-->                
+                           
+                              <apex:selectList id="qOptionLista" multiselect="false" size="1" value="{!question.resObj.ExAM__Response__c}" >
+                              <apex:selectOptions value="{!question.optionsList}" />
+                             </apex:selectList>                      
+                        </apex:pageBlockSectionItem> 
+                        
+                   </apex:pageBlockSection>
+                    <apex:pageBlockSection columns="1" rendered="{!(question.newquestFormat.ExAM__Question_Type__c=='RadioPicklist' && question.newquestFormat.ExAM__HelpText__c!='Dropdown')}">
+                       <apex:outputPanel rendered="{!NOT(ISNULL(question.newquestFormat.ExAM__HelpText__c))}"><b>Q.{!qnum} {!question.newquestFormat.ExAM__Question_Label__c}</b><span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.ExAM__HelpText__c}"/></span>
+                       <b style="color:red;font-size:20px;">{!IF(question.newquestFormat.ExAM__Is_Mandatory__c, '*','')}</b>
+                       </apex:outputPanel>
+                        <apex:outputPanel rendered="{!ISNULL(question.newquestFormat.ExAM__HelpText__c)}"><b>Q.{!qnum} {!question.newquestFormat.ExAM__Question_Label__c}</b>
+                        <b style="color:red;font-size:20px;">{!IF(question.newquestFormat.ExAM__Is_Mandatory__c, '*','')}</b>
+                        </apex:outputPanel>
+                       <apex:pageBlockSectionItem > 
+                               <!--<apex:selectRadio layout="pageDirection" id="qOptionList">-->
+                              <apex:outputPanel > 
+                                <apex:selectRadio styleClass="validateradio{!question.newquestFormat.ExAM__Is_Mandatory__c}" layout="pageDirection" id="qOptionList" value="{!question.resObj.ExAM__Response__c}" onchange="CreateAssignment();decisionTreeOpenWindow(this,{!question.decisionTreeFlag},'{!question.newquestFormat.Id}' );return false;">
+                                    <apex:selectOptions value="{!question.optionsList}" />      
+                                </apex:selectRadio>
+                                
+                                <div class="errorMsg" style="display:none;">
+                                    <strong>Error:</strong> 
+                                    You must select a value
+                                </div> 
+                              </apex:outputPanel>                                 
+                        </apex:pageBlockSectionItem>   
+                   </apex:pageBlockSection>
+                 <apex:variable var="qnum" value="{!qnum+1}"/> 
+              </apex:repeat>    
+         </apex:pageBlock>
+     </apex:outputPanel>                                           
+              </td></tr>  
+
+        
+       </table>           
+       <apex:actionFunction action="{!CreateAssignmentManager}" name="CreateAssignment" reRender="hdIssueId"/>
+                    
+  </apex:form>
+    <script>
+        
+        function requiredValidate(btntype,secId) {
+            var errorFlag = false;
+            $('.validatetrue').each(function() {
+                if($(this).val() == '' || $(this).val().trim() == '') {
+                    $(this).next('div').css('display','');                    
+                    $(this).addClass('error');
+                    errorFlag = true;
+                } else {
+                    $(this).next('div').css('display','none');
+                    $(this).removeClass('error');
+                }
+            });
+            $('.validatecheckboxtrue').each(function() {
+                $(this).addClass('currentcheckbox');
+                //alert($('.currentcheckbox input[type=checkbox]:checked').length);
+                if($('.currentcheckbox input[type=checkbox]:checked').length == 0) {
+                    $( this ).parent().next('div').css('display','');
+                    //alert('checkbox');
+                    errorFlag = true;
+                } else {
+                    $( this ).parent().next('div').css('display','none');
+                }
+                $(this).removeClass('currentcheckbox');
+                
+            });
+            $('.validateradiotrue').each(function() {
+                $(this).addClass('currentRadio');
+                if($('.currentRadio input[type=radio]:checked').length == 0) {
+                    $( this ).parent().next('div').css('display','');
+                    errorFlag = true;
+                } else {
+                    $( this ).parent().next('div').css('display','none');
+                }
+                $(this).removeClass('currentRadio');
+                
+            });
+            
+            if (!errorFlag) {
+                if(btntype == 'sectionbutton') {
+                    SaveAns(secId);
+                }else if(btntype == 'button') {
+                    saveAnswerBtn();
+                } else if(btntype == 'continuebutton') {
+                    saveContinueBtn();
+                }else if(btntype =='completebutton') {
+                    submitbtn();
+                }//,secId
+            
+            } else { 
+                return null;
+            }
+        }
+
+        function closeIframe()
+        {
+            $('.ui-dialog-content').dialog('close');
+            return false;
+        }                
+    </script>       
+    
+</apex:page>

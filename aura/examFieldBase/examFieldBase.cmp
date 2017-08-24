@@ -1,0 +1,33 @@
+<aura:component access="public" extensible="true">
+
+    <aura:attribute name="record" type="Map" access="public"/>
+    <aura:attribute name="fieldLabel" type="String" access="public"/>
+    <aura:attribute name="fieldName" type="String" access="public"/>
+    <aura:attribute name="Id" type="String" access="public"/>
+    <aura:attribute name="sObjectName" type="String" access="public"/>
+    <aura:attribute name="defaultMode" type="String" default="view" access="public"/>
+    <aura:attribute name="editMode" default="True" type="Boolean" access="public"/>
+    <aura:attribute name="showLabel" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="cssClass" type="String" access="public"/>
+    <aura:attribute name="spreadButtons" type="Boolean" default="true" access="public"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" access="public"/>
+
+
+    <aura:registerEvent name="updateFields" type="c:updateFieldEvt"/>
+    <aura:registerEvent name="notificationEvent" type="c:NotificationEvt"/>
+
+
+    <aura:if isTrue="{!v.showSpinner}">
+        <div class="slds-spinner_container">
+            <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+
+
+    {!v.body}
+
+</aura:component>

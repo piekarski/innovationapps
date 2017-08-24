@@ -1,0 +1,64 @@
+<apex:page >
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="2">
+				<apex:outputText >Continuous_Survey_Section_Id: </apex:outputText>
+                	<apex:outputText >{!$Label.Continuous_Survey_Section_Id}</apex:outputText>
+				<apex:outputText >VBA_Customer_Feeback_Template_Name</apex:outputText>
+                	<apex:outputText >{!$Label.VBA_Customer_Feeback_Template_Name}</apex:outputText>
+				<apex:outputText >X20_Veterans_Benefits_Account_id</apex:outputText>
+                	<apex:outputText >{!$Label.X20_Veterans_Benefits_Account_id}</apex:outputText>
+				<apex:outputText >VBA_Customer_Feeback_Section_Id</apex:outputText>
+                	<apex:outputText >{!$Label.VBA_Customer_Feeback_Section_Id}</apex:outputText>
+				<apex:outputText >NCA_Customer_Feeback_Template_Name</apex:outputText>
+                	<apex:outputText >{!$Label.NCA_Customer_Feeback_Template_Name}</apex:outputText>
+				<apex:outputText >Trigger_Assignment_template</apex:outputText>
+                	<apex:outputText >{!$Label.Trigger_Assignment_template}</apex:outputText>
+				<apex:outputText >X20_Veterans_Benefits_OBPI_Survey_Section_Id</apex:outputText>
+                	<apex:outputText >{!$Label.X20_Veterans_Benefits_OBPI_Survey_Section_Id}</apex:outputText>
+				<apex:outputText >VBA_Customer_Feedback_Survey_Template</apex:outputText>
+                	<apex:outputText >{!$Label.VBA_Customer_Feedback_Survey_Template}</apex:outputText>
+				<apex:outputText >VBA_Account_Id</apex:outputText>
+                	<apex:outputText >{!$Label.VBA_Account_Id}</apex:outputText>
+				<apex:outputText >NCA_Customer_Feeback_Section_Id</apex:outputText>
+                	<apex:outputText >{!$Label.NCA_Customer_Feeback_Section_Id}</apex:outputText>
+				<apex:outputText >X20_Veterans_Benefits_OBPI_Survey_Template</apex:outputText>
+                	<apex:outputText >{!$Label.X20_Veterans_Benefits_OBPI_Survey_Template}</apex:outputText>
+				<apex:outputText >Contractor_Section_Id</apex:outputText>
+                	<apex:outputText >{!$Label.Contractor_Section_Id}</apex:outputText>
+				<apex:outputText >ITRM_Customer_Feedback_Survey_Template</apex:outputText>
+                	<apex:outputText >{!$Label.ITRM_Customer_Feedback_Survey_Template}</apex:outputText>
+				<apex:outputText >ITRM_Customer_Feedback_Section_Id</apex:outputText>
+                	<apex:outputText >{!$Label.ITRM_Customer_Feedback_Section_Id}</apex:outputText>
+				<apex:outputText >NCA_Customer_Feedback_Survey_Template</apex:outputText>
+                	<apex:outputText >{!$Label.NCA_Customer_Feedback_Survey_Template}</apex:outputText>
+				<apex:outputText >NCA_Account_Id</apex:outputText>
+                	<apex:outputText >{!$Label.NCA_Account_Id}</apex:outputText>
+				<apex:outputText >ITRM_Customer_Feedback_Template_Name</apex:outputText>
+                	<apex:outputText >{!$Label.ITRM_Customer_Feedback_Template_Name}</apex:outputText>
+				<apex:outputText >Continuous_Survey_Section_Id_3</apex:outputText>
+                	<apex:outputText >{!$Label.Continuous_Survey_Section_Id_3}</apex:outputText>
+				<apex:outputText >ITRM_Account_id</apex:outputText>
+                	<apex:outputText >{!$Label.ITRM_Account_Id}</apex:outputText>
+				<apex:outputText >Send_Account_Email</apex:outputText>
+                	<apex:outputText >{!$Label.Send_Account_Email}</apex:outputText>
+				<apex:outputText >AGP_Survey_Trigger_Assignment_template</apex:outputText>
+                	<apex:outputText >{!$Label.AGP_Survey_Trigger_Assignment_template}</apex:outputText>
+
+                <apex:outputText >X20_Veterans_Benefits_OBPI_Survey_Template_Name</apex:outputText>
+                	<apex:outputText >{!$Label.X20_Veterans_Benefits_OBPI_Survey_Template_Name}</apex:outputText>
+				<apex:outputText >Share_your_VA_Experience</apex:outputText>
+                	<apex:outputText >{!$Label.Share_your_VA_Experience}</apex:outputText>
+				<apex:outputText >Continuous_Survey_URL</apex:outputText>
+                	<apex:outputText >{!$Label.Continuous_Survey_URL}</apex:outputText>
+				<apex:outputText >Holding_Account_Id</apex:outputText>
+                	<apex:outputText >{!$Label.Holding_Account_Id}</apex:outputText>
+				<apex:outputText >Community_Admin_EmaiL</apex:outputText>
+                	<apex:outputText >{!$Label.Community_Admin_Email}</apex:outputText>
+				<apex:outputText >Standard_URL</apex:outputText>
+                	<apex:outputText >{!$Label.Standard_URL}</apex:outputText>
+			</apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+           
+</apex:page>

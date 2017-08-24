@@ -1,0 +1,14 @@
+<apex:page sidebar="false" showHeader="True">
+    <apex:pageBlock title=" ">
+        <apex:pageBlockSection columns="1">
+           <apex:outputLink value="EntryPage" id="Home"> Back </apex:outputLink>
+        </apex:pageBlockSection>
+	</apex:pageBlock>
+    <apex:pageBlock title="IRIS Completed Inquries Entry">
+        <apex:pageBlockSection columns="1">
+           <flow:interview name="IRISInquiry"/>
+        </apex:pageBlockSection>
+	</apex:pageBlock>
+    <apex:enhancedList type="VBA_CC_Tracking_IRIS_Tracker__c" height="300" rowsPerPage="50" id="IRISList" />
+    <apex:enhancedList type="VBA_CCTracking_Agent_Production_Data__c" height="300" rowsPerPage="25" id="AgentDataList" />	
+</apex:page>

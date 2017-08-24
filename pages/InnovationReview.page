@@ -1,0 +1,245 @@
+<apex:page sidebar="false" showHeader="true" title="Innovation Review" id="InnovationReview" language="en" applyHtmlTag="true">
+    <head>
+        <meta charset="utf-8"></meta>
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width"></meta>
+        <apex:stylesheet value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/exam/css/bootstrap.min.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/exam/css/main.min.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/exam/css/font-awesome.min.css')}"/>
+    </head>
+    <div class="application-manager" ng-app="innovatorGrants">
+        <div ng-controller="reviewCtrl">
+
+            <div class="" role="form">
+            <div class="row pill-box">
+                <div class="col-xs-12">
+                    <ul class="nav nav-pills ">
+                        <li class="active">
+                            <a href="javascript:" ng-click="manageLink()">
+                                My Reviews</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+                <div id="application" ng-show="application" class="panel">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h2>{{application.Name__c}}</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-7">
+                            <table class="table table-bordered table-striped">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            Applicant Name
+                                        </td>
+                                        <td>{{application.Exam_User__r.Name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Location
+                                        </td>
+                                        <td>{{application.ExAM__Location__c}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Category
+                                        </td>
+                                        <td>{{ application.ExAM__Assessment_Template_Type__c }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Status
+                                        </td>
+                                        <td>{{application.ExAM__Status__c}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Application Type
+                                        </td>
+                                        <td>{{application.ExAM__Assessment_Template_Type__c}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-4">
+                            <button class="btn btn-secondary" ng-click="openPdf()">View Application as PDF</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-4">
+                            <button class="btn btn-secondary" ng-click="openApplication()"> Start/Edit My Review</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-4">
+                            <button class="btn btn-secondary" ng-click="openReviewPdf()">View as PDF</button>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="!appSubmitted">
+                        <div class="col-xs-12 col-sm-4">
+                            <button class="btn btn-primary" ng-click="submitApplication()">Submit My Application</button>
+                        </div>
+
+                    </div>
+                    <div class="row" ng-show="showAlert">
+
+                        <div class="col-xs-12 col-sm-4">
+
+                            <div uib-alert="true" type="success" class="alert alert-success" close="closeAlert()" dismiss-on-timeout='5000'>{{msg}}</div>
+                        </div>
+                    </div>
+
+                    <div class="panel attachments">
+                        <div class="row">
+                            <div class="col-xs-12 ">
+                                <h3>Application Attachments</h3>
+                            </div>
+                        </div>
+
+                        <div class="row" ng-if="!application.NotesAndAttachments.records.length ">
+                            <div class="col-xs-12 ">
+                                <h4>No files have been attached to this application</h4>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="application.NotesAndAttachments.records.length > 0">
+                            <div class="col-xs-12 col-sm-5">
+                                <input type="text" class="form-control" placeholder="Filter Results" ng-model="search"></input>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="application.NotesAndAttachments.records.length > 0">
+                            <div class="col-xs-12 col-sm-7">
+
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <td>
+                                                <a href="javascript:" ng-click="sortType = 'Title'; sortReverse = !sortReverse">File Name
+                                                    <span ng-show="sortType == 'Title' && sortReverse" class="fa fa-caret-down"></span>
+                                                    <span ng-show="sortType == 'Title' && !sortReverse" class="fa fa-caret-up"></span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="file in application.NotesAndAttachments.records | orderBy:sortType:sortReverse | filter:search">
+                                            <td>
+                                                <a href="javascript:" ng-click="getAttachment(file.Id, file.Title)">{{ file.Title }}</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel attachments">
+                        <div class="row">
+                            <div class="col-xs-12 ">
+                                <h3>My Review Attachments</h3>
+                            </div>
+                        </div>
+                        <div class="row panel panel-upload">
+                            <div ng-if="spinnerOn" class="maskDiv">
+                                <div class="large spinner">
+                                    <div>Loading…</div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 ">
+                                <h4>Select a file to upload</h4>
+                            </div>
+                            <div class="col-xs-12 col-sm-5 ">
+                                <input type="file" class="form-control" ng-model="file" name="file" base-sixty-four-input="true" onload="" maxsize="500"/>
+                                <label ng-if="!file && fileMissing" class="required">Please choose a file</label>
+
+                            </div>
+                            <div class="col-xs-12  col-sm-7">
+                                <button class="btn btn-upload" ng-class="{'upload-ready' : (file)}" ng-click="uploadFile()">Upload File
+                                    <span class="fa fa-arrow-up"/></button>
+
+                                <button ng-show="file" class="btn btn-clear" ng-click="clearFile()">Clear this Upload
+                                    <span class="fa fa-trash"/></button>
+
+                            </div>
+
+                            <div class="col-xs-12 col-sm-5" ng-if="fileUploaded">
+                                <div uib-alert="true" ng-if="fileUploaded" type="success" class="alert alert-success" close="closeAlert()" dismiss-on-timeout='5000'>Your file has been uploaded</div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-5" ng-if="fileDeleted">
+                                <div uib-alert="true" ng-if="fileDeleted" type="danger" class="alert alert-danger" close="closeAlert()" dismiss-on-timeout='5000'>Your file has been deleted</div>
+                            </div>
+
+                        </div>
+                        <div class="row" ng-if="!review.NotesAndAttachments.records.length ">
+                            <div class="col-xs-12 ">
+                                <h4>You have no files added</h4>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="review.NotesAndAttachments.records.length > 0">
+                            <div class="col-xs-12 col-sm-5">
+                                <input type="text" class="form-control" placeholder="Filter Results" ng-model="search"></input>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="review.NotesAndAttachments.records.length > 0">
+                            <div class="col-xs-12 col-sm-7">
+
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <td>
+                                                <a href="javascript:" ng-click="sortType = 'Title'; sortReverse = !sortReverse">File Name
+                                                    <span ng-show="sortType == 'Title' && sortReverse" class="fa fa-caret-down"></span>
+                                                    <span ng-show="sortType == 'Title' && !sortReverse" class="fa fa-caret-up"></span>
+                                                </a>
+                                            </td>
+                                            <td>Remove File From Application
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="file in review.NotesAndAttachments.records | orderBy:sortType:sortReverse | filter:search">
+                                            <td>
+                                                <a href="javascript:" ng-click="getAttachment(file.Id, file.Title)">{{ file.Title }}</a>
+                                            </td>
+                                            <td>
+                                                <span ng-click="deleteFile(file.Id)" class="fa fa-trash remove-link"></span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <input type="hidden" ng-model="sessionId" ng-init="sessionId='{!$Api.Session_ID}'"></input>
+            <input type="hidden" ng-model="userId" ng-init="userId='{!$User.id}'"></input>
+            <input type="hidden" ng-model="url" ng-init="url='{!$CurrentPage.Url}'"></input>
+            <input type="hidden" ng-model="appId" ng-init="appId='{!$CurrentPage.parameters.appid}'"></input>
+            <input type="hidden" ng-model="reviewId" ng-init="reviewId='{!$CurrentPage.parameters.rid}'"></input>
+            <input type="hidden" ng-model="appCreated" ng-init="appCreated='{!$CurrentPage.parameters.appCreated}'"></input>
+            <input type="hidden" ng-model="saved" ng-init="saved='{!$CurrentPage.parameters.saved}'"></input>
+
+        </div>
+    </div>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/select-tpls.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/app.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/controllers.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/services.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/directives.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular-scroll.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/ui-bootstrap-tpls-2.0.1.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular-base64-upload.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/Blob.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/FileSaver.min.js  ')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular-file-saver.min.js')}"/>
+</apex:page>

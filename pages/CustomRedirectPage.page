@@ -1,0 +1,19 @@
+<apex:page sidebar="false" showHeader="false"> 
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-78699289-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+  <!--<center> <h1> <font color="red"> Should add appropriate contents here</font></h1> </center>-->
+  <table width="100%" style="border-bottom: 3px solid #00335b;padding-bottom:10px;padding-right:5%;padding-left:5%;">
+     <tr><td><apex:image url="{!$Resource.VALogo}" width="250" height="153"/></td></tr>
+    </table>
+   
+  <br/><br/>
+  <center> <h1>Sucessfully submitted the Survey</h1></center>
+</apex:page>

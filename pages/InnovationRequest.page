@@ -1,0 +1,142 @@
+<apex:page sidebar="false" showHeader="" title="Innovation Request" id="InnovationRequest" language="en" applyHtmlTag="true">
+
+    <head>
+        <meta charset="utf-8"></meta>
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width"></meta>
+        <apex:stylesheet value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/exam/css/bootstrap.min.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/exam/css/main.min.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/exam/css/select.min.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/exam/css/font-awesome.min.css')}"/>
+
+    </head>
+    <div class="header-wrap">
+        <div class="header">
+            <!-- /header alert box -->
+            <div class="row full">
+                <div class="small-6 medium-4 columns">
+                    <h1 role="banner" class="va-header-logo">
+                        <a target="_blank" href="http://vets.gov">Vets.gov</a>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="pitch-wrapper col-xs-11 col-xs-push-1">
+                    <div class="pitch">
+                        <h1 class="tagline">Innovator Network Grant Applications</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+
+        <div ng-app="innovatorGrants">
+            <div ng-controller="requestCtrl" class="waveDashboard">
+                <input type="hidden" ng-model="sessionId" ng-init="sessionId='{!$Api.Session_ID}'"></input>
+                <input type="hidden" ng-model="userId" ng-init="userId='{!$User.id}'"></input>
+                <input type="hidden" ng-model="url" ng-init="url='{!$CurrentPage.Url}'"></input>
+                <input type="hidden" ng-model="locations" ng-init="locations='{!$Label.InnovationLocation}'"></input>
+                <input type="hidden" ng-model="categories" ng-init="categories='{!$Label.InnovationCategory}'"></input>
+                <div ng-if="spinnerOn" class="maskDiv">
+                    <div class="large spinner">
+                        <div>Loading…</div>
+                    </div>
+                </div>
+                <div class="row pill-box">
+                    <div class="col-xs-12">
+                        <ul class="nav nav-pills ">
+                            <li class="inactive">
+                                <a href="javascript:" ng-click="manageLink()">
+                                    My Applications</a>
+                            </li>
+                            <li class="active">
+                                <a href="javascript:" ng-click="newApp()">Create New Application</a>
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="" role="form">
+                    <div class="panel">
+
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-5">
+                                <h3>Enter a name for your grant application.</h3>
+                                <label>
+                                    <input type="text" placeholder="Short description of your request" name="grantName" ng-model="grantApp.name"/>
+
+                                </label>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-5">
+                                <h3>Select your site.</h3>
+                                <label>
+                                    <select name="appLocation" ng-model="grantApp.location" id="appLocation">
+                                        <option value="0" selected="true">Select</option>
+                                        <option ng-repeat="item in locations.split('~')">{{item}}</option>
+                                    </select>
+                                </label>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-5">
+                                <h3>Select a category for your Grant Application.</h3>
+                                <label>
+                                    <select name="appCategory" ng-model="grantApp.category" id="appCategory">
+                                        <option value="0" selected="true">Select</option>
+                                        <option ng-repeat="item in categories.split('~')">{{item}}</option>
+                                    </select>
+                                </label>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12 ">
+                                <h3>Select a grant type.</h3>
+                                <div ng-repeat="tier in grantTiers" class="radio">
+                                    <label>
+                                        <input type="radio" name="grantTier" ng-model="grantApp.templateId" ng-value="tier.Id"/>
+                                        <div class="grant-title">{{tier.ExAM__Template_name__c}}</div>
+                                        <div>{{tier.ExAM__Description__c}}</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" ng-if="fieldsMissing">
+                            <div class="col-xs-12 col-sm-5">
+                                <div uib-alert="true" ng-if="fieldsMissing" type="danger" class="alert alert-danger" close="closeAlert()" dismiss-on-timeout='5000'>Please Enter All Fields</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-4 button-wrap">
+                                <button class="btn btn-primary" ng-click="createApp()">Create Grant Application</button>
+                            </div>
+                            <div class="col-xs-12 col-sm-4 button-wrap">
+                                <button class="btn btn-secondary" ng-click="cancelApp()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/select-tpls.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/app.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/controllers.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/services.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/js/directives.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular-scroll.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/ui-bootstrap-tpls-2.0.1.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular-base64-upload.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/Blob.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/FileSaver.min.js  ')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.InnovationStaticResources ,'www/lib/angular/angular-file-saver.min.js')}"/>
+</apex:page>

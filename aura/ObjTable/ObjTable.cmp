@@ -1,0 +1,145 @@
+<aura:component >
+
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+  <aura:handler name="fireIndex" event="c:PaginatorEvt" action="{!c.gotoPage}"/>
+  <aura:handler name="ObjCancelCreateEvt" event="c:ObjCancelCreateEvt" action="{!c.objCreated}"/>
+  <aura:handler event="c:fireObjChangedEvt" action="{!c.reloadObj}"/>
+  <aura:registerEvent name="notificationEvent" type="c:NotificationEvt"/>
+  <aura:attribute name="recordPerPage" type="Integer" default="100" access="public"/>
+  <aura:attribute name="currentPage" type="Integer" default="1" access="public"/>
+  <aura:attribute name="max" type="Integer" access="public"/>
+  <aura:attribute name="showExamManageTemp" type="Boolean" default="false" access="public"/>
+  <aura:attribute name="showSpinner" type="Boolean" default="false" access="public"/>
+  <aura:attribute name="hasFetchObj" type="Boolean" access="public"/>
+  <aura:attribute name="sorting" type="Map" default="{'column' : 'CreatedDate','order' : 'desc'}"/>
+  <aura:attribute name="template_Name" type="String" access="public"/>
+  <aura:attribute name="position" type="String" access="public"/>
+  <aura:attribute name="index" type="String" access="public"/>
+  <aura:attribute name="action" type="String" access="public"/>
+  <aura:attribute name="message" type="String" access="public"/>
+  <aura:attribute name="ObjTemplates" type="sobject[]" access="public"/>
+  <aura:attribute name="totalObjTemplates" type="sobject[]" access="public"/>
+  <aura:attribute name="ObjTemplate" type="sobject" access="public"/>
+  <aura:attribute name="objApi" type="String" access="public"/>
+  <aura:attribute name="objLabel" type="String" access="public"/>
+  <aura:attribute name="objFields" type="Object[]" access="global"/>
+  <aura:attribute name="objFilter" type="String" access="public"/>
+  <aura:attribute name="objOrder" type="String" access="public"/>
+  <aura:attribute name="dialogTitle" type="String" access="public"/>
+  <aura:attribute name="dialogSubmitText" type="String" access="public"/>
+  <aura:attribute name="dialogObjId" type="String" access="public"/>
+  <aura:attribute name="dialogAMId" type="String" access="public"/>
+  <aura:attribute name="dialogNameEdit" type="Boolean" access="public"/>
+  <aura:attribute name="dialogStatusEdit" type="Boolean" access="public"/>
+  <aura:handler name="ObjTableItemClick" event="c:ObjTableItemClick" action="{!c.itemClicked}"/>
+  <aura:method name="updateObj" action="{!c.updateObjList}">
+    <aura:attribute name="totalObj" type="sobject[]" access="public"/>
+  </aura:method>
+  <!-- <aura:handler name="ctrlLinkMenuEvt" event="c:ctrlLinkMenuEvt" action="{!c.menuChange}"/> -->
+
+  <article class="">
+    <div class="slds-card__body slds-p-around--small">
+      <div class="" aura:id="addNewObj"/>
+      <div class="slds-grid slds-wrap slds-grid--vertical-align-center slds-p-bottom--small">
+        <div aura:id="addBtn" class="slds-m-vertical--large">
+          <a class="slds-button slds-button--neutral" onclick="{!c.createNewObj}">
+            <span class="fa fa-plus slds-m-right--x-small"/>New Application
+          </a>
+        </div>
+
+      </div>
+      <aura:if isTrue="{!v.ObjTemplates.length > 0}">
+
+      <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+        <thead>
+          <tr class="slds-text-title--caps">
+            <aura:iteration items="{!v.objFields}" var="field" indexVar="index">
+              <aura:if isTrue="{!field.fieldDisplay}">
+                <th scope="col" data-name="{!field.fieldApi}" onclick="{!c.sortByColumn}">
+                  <div title="{!field.fieldLabel}">{!field.fieldLabel}
+                    <a class="{!v.sorting.column == field.fieldApi ? 'slds-show' : 'slds-hide'}">
+                      <lightning:icon iconName="{!v.sorting.order == 'asc' ? 'utility:chevronup' : 'utility:chevrondown'}" size="x-small"/>
+                    </a>
+                  </div>
+                </th>
+              </aura:if>
+            </aura:iteration>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <aura:iteration items="{!v.ObjTemplates}" var="ObjTemplate" indexVar="objIndex">
+            <tr>
+
+              <aura:iteration items="{!v.objFields}" var="field" indexVar="fieldIndex">
+                <aura:if isTrue="{!field.fieldDisplay}">
+                  <td class="slds-truncate">
+                    <c:ObjTableItem sobject="{!ObjTemplate}" field="{!field}" />
+                  </td>
+                </aura:if>
+              </aura:iteration>
+              <td class="">
+                <div class="tooltip-container">
+                  <a onclick="{!c.dialogSpawn}" data-dialogType="dialogNameEdit" data-objId="{!ObjTemplate.Id}" data-AMId="{!ObjTemplate.Assignment_Manager_ID__c}"><lightning:icon class="slds-m-right--medium" iconName="action:edit" size="x-small"/></a>
+                  <div class="slds-popover slds-popover--tooltip slds-nubbin--bottom-left" role="tooltip" id="help">
+                     <div class="slds-popover__body">{# 'Edit ' + v.objLabel + ' Name'}
+                     </div>
+                  </div>
+                </div>
+
+                <div class="tooltip-container">
+                  <a onclick="{!c.dialogSpawn}" class="{!ObjTemplate.Additional_Status__c == 'Submitted' ? 'disabled' : ''}" data-dialogType="dialogStatusEdit" data-objId="{!ObjTemplate.Id}" data-AMId="{!ObjTemplate.Assignment_Manager_ID__c}"><lightning:icon class="slds-m-right--medium" iconName="action:update_status" size="x-small"/></a>
+                  <div class="exam-tooltip slds-popover slds-popover--tooltip slds-nubbin--bottom-left" role="tooltip" id="help">
+                     <div class="slds-popover__body">{!ObjTemplate.Additional_Status__c == 'Submitted' ? v.objLabel + ' Submitted' : 'Submit ' + v.objLabel + ' For Review'}
+                     </div>
+                  </div>
+                </div>
+
+              </td>
+            </tr>
+          </aura:iteration>
+        </tbody>
+      </table>
+
+      <aura:set attribute="else">
+        <div class="slds-text-heading--medium">No applications created</div>
+      </aura:set>
+    </aura:if>
+    </div>
+  </article>
+
+  <aura:if isTrue="{!v.showSpinner}">
+    <div class="slds-spinner_container">
+      <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+        <span class="slds-assistive-text">Loading</span>
+        <div class="slds-spinner__dot-a"></div>
+        <div class="slds-spinner__dot-b"></div>
+      </div>
+    </div>
+  </aura:if>
+
+<div role="dialog" tabindex="-1" aria-labelledby="modalTitle" aura:id="modal" class="slds-modal">
+  <div class="slds-modal__container">
+    <div class="slds-modal__header">
+
+      <h2 id="modalTitle" class="slds-text-heading--medium">{!v.dialogTitle}</h2>
+    </div>
+    <div class="slds-modal__content slds-p-around--medium">
+      <aura:if isTrue="{!v.dialogNameEdit}">
+        <ui:inputText aura:id="nameInput" placeholder="Enter a name" class="slds-input"/>
+      </aura:if>
+      <aura:if isTrue="{!v.dialogStatusEdit}">
+        <div class=" slds-align_absolute-center slds-text-heading--small ">
+          Are you sure you want to submit this application?
+        </div>
+      </aura:if>
+    </div>
+    <div class="slds-modal__footer">
+      <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">Cancel</button>
+      <button class="slds-button slds-button--brand" onclick="{!c.dialogSubmit}">{!v.dialogSubmitText}</button>
+    </div>
+  </div>
+</div>
+  <div aura:id="backdrop" class="slds-backdrop"></div>
+
+</aura:component>

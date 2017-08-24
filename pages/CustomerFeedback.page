@@ -1,0 +1,466 @@
+<apex:page sidebar="false" showHeader="false" standardController="Main_questionaire__c" extensions="CustomerFeedbackController"  recordSetVar="sitem" id="thePage" standardStylesheets="true" tabStyle="IssueRequest_Life_Cycle__c" title="{!$CurrentPage.parameters.templatename}" language="en" docType="html-5.0"> 
+<title>{!templatename}</title>
+<meta name="viewport" content="width=device-width-5, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes;"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11" />
+<apex:stylesheet value="{!URLFOR($Resource.Datepicker,'Datepicker/jquery-ui.min.css')}"/>
+<apex:includeScript value="{!URLFOR($Resource.Datepicker,'Datepicker/jquery-1.10.2.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.Datepicker,'Datepicker/jquery-ui.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.jQueryFiles, 'jquery.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.jQueryFiles, 'jquery-ui.min.js')}"/>
+
+<script language="JavaScript" type="text/javascript">    
+ window.onload=function()
+           {
+             CreateAssignment();
+           };
+function saveDone()
+    {
+        alert('Record Saved Successfully !!!');
+        //window.open('/apex/QuestionnaireCustom');
+        top.location.reload(true);
+    }
+
+    function viewComments (questionID, commentCount, isAdd)
+    {
+        var commentBoxID = questionID+'att';
+        var commentTextAreaID = questionID+'row1';
+        var viewLinkID = questionID+'view';
+        document.getElementById(commentBoxID).style.display='block';
+        document.getElementById(viewLinkID).innerHTML="<a onclick=\"hideComments('"+questionID+"',"+commentCount+");return false;\" href='#'>Hide Comments</a> | ";
+        document.getElementById(viewLinkID).style.display='inline';
+        if (isAdd==1)
+            document.getElementById(commentTextAreaID).focus();
+   }
+
+    function hideComments (questionID, commentCount)
+    {
+        var commentBoxID = questionID+'att';
+        var viewLinkID = questionID+'view';
+        document.getElementById(commentBoxID).style.display='none';
+        document.getElementById(viewLinkID).innerHTML="<a onclick=\"viewComments('"+questionID+"',"+commentCount+", 0);return false;\" href='#'>View/Edit Comments</a> | ";
+        if (commentCount==0)
+        document.getElementById(viewLinkID).style.display='none';
+    } 
+</script>
+<style type="text/css">
+ 
+  body .bPageBlock {
+      border-top-width:0px;
+      }
+  .mysecButton {
+        
+        -moz-box-shadow: 3px 4px 0px 0px #1564ad;
+        -webkit-box-shadow: 3px 4px 0px 0px #1564ad;
+        box-shadow: 3px 4px 0px 0px #1564ad;
+        
+        background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #79bbff), color-stop(1, #378de5));
+        background:-moz-linear-gradient(top, #79bbff 5%, #378de5 100%);
+        background:-webkit-linear-gradient(top, #79bbff 5%, #378de5 100%);
+        background:-o-linear-gradient(top, #79bbff 5%, #378de5 100%);
+        background:-ms-linear-gradient(top, #79bbff 5%, #378de5 100%);
+        background:linear-gradient(to bottom, #79bbff 5%, #378de5 100%);
+        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#79bbff', endColorstr='#378de5',GradientType=0);
+        
+        background-color:#79bbff;
+        
+        -moz-border-radius:5px;
+        -webkit-border-radius:5px;
+        border-radius:5px;
+        
+        border:1px solid #337bc4;
+        
+        display:inline-block;
+        color:#ffffff;
+        font-family:arial;
+        font-size:17px;
+        font-weight:bold;
+        padding:12px 44px;
+        text-decoration:none;
+        
+        text-shadow:0px 1px 0px #528ecc;
+        
+    }
+    .sec{
+        
+        background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #378de5), color-stop(1, #79bbff));
+        background:-moz-linear-gradient(top, #378de5 5%, #79bbff 100%);
+        background:-webkit-linear-gradient(top, #378de5 5%, #79bbff 100%);
+        background:-o-linear-gradient(top, #378de5 5%, #79bbff 100%);
+        background:-ms-linear-gradient(top, #378de5 5%, #79bbff 100%);
+        background:linear-gradient(to bottom, #378de5 5%, #79bbff 100%);
+        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#378de5', endColorstr='#79bbff',GradientType=0);
+        
+        background-color:#378de5;
+    }
+    .myButton:active {
+        position:relative;
+        top:1px;
+    }
+    .myButton:active {
+        position:relative;
+    }
+
+    .democlass {
+        width:98%;
+    }
+
+    .detailList {
+        width:100%;
+    }    
+
+    .editComment {
+        font-style: italic;
+        font-size: small;
+        float:right;
+    }
+
+    .commentBox {
+        background-color: white;
+        border: thin solid gray;
+        margin: 0 17px;
+        padding: 5px 25px;
+    }
+
+    .commentBoxHeader {
+        background-color: #BBBBBB;
+        border: thin solid gray;
+        margin: 0 17px;
+        padding: 5px 10px;
+    }
+
+    .commentBoxHeaderActions {
+        float:right;
+    }
+    
+    .commentBox p {
+        border-bottom: thin dotted black;
+        margin: 0;
+        padding: 2px 0;
+    }
+
+    .addCommentContainer {
+        padding: 5px 250px;
+    }
+
+    .addCommentTextArea {
+        width: 100%
+    }
+     .vfHelpText a            {position:relative;}
+     .vfHelpText a span       {display: none;}
+     .vfHelpText a:hover span {display: block;
+                                  position:relative;
+                                  top:1.25em;
+                                  padding:2px 5px;                                 
+                                  z-index:100;
+                                  border:1px solid black;
+                                  background-color:##BBBBBB;
+                                  color:black;
+                                 }
+
+</style>
+<apex:form id="templateForm" style="bgcolor:#EEEEEE;font-size:14px" >
+        <br></br>
+          <apex:actionFunction name="callSaveJS" action="{!save}"/>
+<script language="JavaScript" type="text/javascript">
+function function1()
+{//alert('inside');
+callSaveJS();//saveDone();
+}
+</script> 
+     <apex:inputHidden id="hdIssueId"  value="{!issueId}"/>
+    <table width="100%" style="border-bottom: 2px solid #00335b;border-top-width:30px;padding-bottom:0px;padding-right:5%;padding-left:5%;">
+     <tr><td width="10px"><apex:image url="{!$Resource.VAHeaderSurveyLogo}" width="250" height="48"/></td>
+     <td style="text-align:center;padding-right:50px;font-size:25px;"><b> OBPI Survey<b></b></b></td></tr>
+    </table>
+    <table width="100%" style="padding-left:5%;padding-right:5%;">
+            <tr>
+             <td  colspan="2" valign="top">             
+              <apex:outputPanel id="questiondetail">                   
+              <apex:pageBlock id="block1">
+              <apex:pageBlockButtons location="bottom" id="buttons1" >              
+               <apex:commandButton id="button2" value="Save" onclick="requiredValidate('button','');" reRender="none" >
+               </apex:commandButton> 
+               <apex:actionFunction name="saveAnswerBtn" action="{!save}" reRender="none" >
+                     <apex:param name="doRerenderSave" value="true" assignTo="{!doRerenderSave}"/>
+                     <apex:param name="saveType" value="button"/>
+                </apex:actionFunction> 
+                
+                
+                <apex:actionFunction name="SaveAns" action="{!save}" reRender="{!$Component.thePage.templateForm.questiondetail}, pgBlock">
+                    <apex:param name="sectionId" value=""/>
+                    <apex:param name="doRerender" value="true" assignTo="{!doRerender}"/>
+                    <apex:param name="doRerenderSave1" value="true" assignTo="{!doRerenderSave}"/>
+                    <apex:param name="saveType" value="menu"/>
+                </apex:actionFunction>
+                <!--<apex:commandButton value="Cancel" action="{!Cancel}" id="button1" title="Cancel"  />
+                <apex:commandButton value="Submit" onclick="requiredValidate('completebutton','');" reRender="none" style="text-align:center;font-size:1.1em" />
+                <apex:actionFunction name="submitbtn" action="{!submitForApproval}"/>-->
+              </apex:pageBlockButtons>      
+              <apex:variable var="qnum" value="{!1}"/>  
+                  <!--<div style="border-top:none;"><b>Please answer the following survey questions. The questions are of two types of questions: radio buttons and pick lists. For each question choose the most correct answer. Please answer as many questions as you can.
+                Please click the Save button at the bottom of the page before clicking the Submit button.</b></div>-->
+
+
+              <apex:repeat value="{!questionsList}" var="question" > 
+                  <apex:pageBlockSection columns="1" rendered="{!question.newquestFormat.Question_Type__c=='File'}" >
+                       <apex:outputPanel rendered="{!NOT(ISNULL(question.newquestFormat.HelpText__c))}"><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b><span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                      </apex:outputPanel>
+                      <apex:outputPanel rendered="{!ISNULL(question.newquestFormat.HelpText__c)}"><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b>
+                      </apex:outputPanel>
+                       <apex:pageBlockSectionItem >  
+                            <apex:commandButton onclick="window.open('/apex/AttachPicture?amid={!$CurrentPage.parameters.issueid}&quesId={!question.newquestFormat.id}', 'Attachment', 'scrollbars=yes, resizable=yes, top='+((screen.height/2)-250)+', left='+((screen.width/2)-400)+', width=800, height=500');" reRender="none"  value="Upload Attachment" style="text-align:center;font-size:1em" /> 
+                            <apex:outputText value="" styleClass="att{!question.newquestFormat.Id}"></apex:outputText>
+                            
+                        </apex:pageBlockSectionItem> 
+                   </apex:pageBlockSection>
+                   
+                  <apex:pageBlockSection columns="1" rendered="{!question.newquestFormat.Question_Type__c=='Date'}" >
+                       <script>
+                            $(function() {
+                                $( ".datepicker" ).datepicker();
+                            });
+                        </script>
+                        
+                       <apex:outputPanel rendered="{!NOT(ISNULL(question.newquestFormat.HelpText__c))}"><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b><span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                      </apex:outputPanel>
+                      <apex:outputPanel rendered="{!ISNULL(question.newquestFormat.HelpText__c)}"><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b>
+                      </apex:outputPanel>
+                       <!-- <apex:outputPanel rendered="{!question.newquestFormat.HelpText__c==null}" ><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c} </b> <span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                       </apex:outputPanel>-->
+                       <apex:pageBlockSectionItem dataStyle="padding-left:30px;" >  
+                            <!--<apex:outputField value="{!question.newquestFormat.Question_Label__c}" />-->
+                            <apex:outputPanel >
+                                <apex:outputField value="{!question.newquestFormat.Subquestion_Label__c}" />  
+                                <div class="{!IF(question.newquestFormat.Is_mandatory__c,'requiredInput','')}">
+                                    <div class="requiredBlock"></div>
+                                    <apex:inputText styleClass="datepicker validate{!question.newquestFormat.Is_Mandatory__c}" id="dateid" value="{!question.resObj.Response__c}" maxlength="255" />
+                                    <div class="errorMsg" style="display:none;">
+                                        <strong>Error:</strong> 
+                                        You must enter a value
+                                    </div> 
+                                </div>              
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem> 
+                   </apex:pageBlockSection>    
+                   <apex:pageBlockSection columns="1" rendered="{!question.newquestFormat.Question_Type__c=='Text'}" >
+                      <apex:outputPanel rendered="{!NOT(ISNULL(question.newquestFormat.HelpText__c))}"><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b><span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                      </apex:outputPanel>
+                      <apex:outputPanel rendered="{!ISNULL(question.newquestFormat.HelpText__c)}"><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b>
+                      </apex:outputPanel>
+                       <!-- <apex:outputPanel rendered="{!question.newquestFormat.HelpText__c==null}" ><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c} </b> <span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                       </apex:outputPanel>-->
+                       <apex:pageBlockSectionItem dataStyle="padding-left:30px;" >  
+                            <!--<apex:outputField value="{!question.newquestFormat.Question_Label__c}" />-->
+                            <apex:outputPanel >
+                                <apex:outputField value="{!question.newquestFormat.Subquestion_Label__c}" />              
+                                <div class="{!IF(question.newquestFormat.Is_mandatory__c,'requiredInput','')}">
+                                    <div class="requiredBlock"></div>
+                                    <apex:inputText styleClass="validate{!question.newquestFormat.Is_Mandatory__c}" style="width:100%" id="textInf" value="{!question.resObj.Response__c}" maxlength="255" />
+                                    <div class="errorMsg" style="display:none;">
+                                        <strong>Error:</strong> 
+                                        You must enter a value
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>  
+                   </apex:pageBlockSection>
+                 <apex:pageBlockSection columns="1" rendered="{!question.newquestFormat.Question_Type__c=='Textarea'}" >
+                       <apex:outputPanel rendered="{!NOT(ISNULL(question.newquestFormat.HelpText__c))}"><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b><span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                      </apex:outputPanel>
+                      <apex:outputPanel rendered="{!ISNULL(question.newquestFormat.HelpText__c)}"><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b>
+                      </apex:outputPanel>
+                       <!-- <apex:outputPanel rendered="{!question.newquestFormat.HelpText__c==null}" ><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c} </b> <span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                       </apex:outputPanel>-->
+                       <apex:pageBlockSectionItem dataStyle="padding-left:30px;" >  
+                            <!--<apex:outputField value="{!question.newquestFormat.Question_Label__c}" />-->
+                            <apex:outputPanel >
+                            <apex:outputField value="{!question.newquestFormat.Subquestion_Label__c}" />              
+                            <div class="{!IF(question.newquestFormat.Is_mandatory__c,'requiredInput','')}">
+                                <div class="requiredBlock"></div> 
+                                <apex:inputTextarea styleClass="validate{!question.newquestFormat.Is_Mandatory__c}" style="width:100%;" rows="6"  id="textInfo" value="{!question.resObj.Response__c}"></apex:inputTextArea>
+                                <div class="errorMsg" style="display:none;">
+                                    <strong>Error:</strong> 
+                                    You must enter a value
+                                </div>
+                            </div>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                   </apex:pageBlockSection>
+                 <apex:pageBlockSection columns="1" rendered="{!(question.newquestFormat.Question_Type__c=='RadioPicklist' && question.newquestFormat.HelpText__c=='Dropdown')}">
+                       <apex:outputPanel rendered="{!NOT(ISNULL(question.newquestFormat.HelpText__c))}" style="text-align:center;font-size:1.1em" ><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b><span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                       </apex:outputPanel>
+                        <apex:outputPanel rendered="{!ISNULL(question.newquestFormat.HelpText__c)}" style="text-align:center;font-size:1.1em" ><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b>
+                      </apex:outputPanel>
+                       <apex:pageBlockSectionItem >  
+                               <!--<apex:selectRadio layout="pageDirection" id="qOptionList">-->
+                              <apex:selectList id="qOptionLista" multiselect="false" size="1" value="{!question.resObj.Response__c}" >
+                              <apex:selectOptions value="{!question.optionsList}" />
+                             </apex:selectList>                      
+                        </apex:pageBlockSectionItem> 
+                   </apex:pageBlockSection>
+                    <apex:pageBlockSection columns="1" rendered="{!(question.newquestFormat.Question_Type__c=='RadioPicklist' && question.newquestFormat.HelpText__c!='Dropdown')}">
+                       <apex:outputPanel rendered="{!NOT(ISNULL(question.newquestFormat.HelpText__c))}"><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b><span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                       <b style="color:red;font-size:20px;">{!IF(question.newquestFormat.Is_Mandatory__c, '*','')}</b>
+                       </apex:outputPanel>
+                        <apex:outputPanel rendered="{!ISNULL(question.newquestFormat.HelpText__c)}"><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b>
+                        <b style="color:red;font-size:20px;">{!IF(question.newquestFormat.Is_Mandatory__c, '*','')}</b>
+                        </apex:outputPanel>
+                       <apex:pageBlockSectionItem >  
+                               <!--<apex:selectRadio layout="pageDirection" id="qOptionList">-->
+                              <apex:outputPanel > 
+                                <apex:selectRadio styleClass="validateradio{!question.newquestFormat.Is_Mandatory__c}" layout="pageDirection" id="qOptionList" value="{!question.resObj.Response__c}" onchange="CreateAssignment();decisionTreeOpenWindow(this,{!question.decisionTreeFlag},'{!question.newquestFormat.Id}' );return false;">
+                                    <apex:selectOptions value="{!question.optionsList}" />
+                                </apex:selectRadio>
+                                <div class="errorMsg" style="display:none;">
+                                    <strong>Error:</strong> 
+                                    You must select a value
+                                </div> 
+                              </apex:outputPanel>                   
+                        </apex:pageBlockSectionItem>    
+                   </apex:pageBlockSection>
+                   <apex:pageBlockSection columns="1" rendered="{!question.newquestFormat.Question_Type__c=='MultiselectPicklist'}" >             
+                     <apex:outputPanel rendered="{!NOT(ISNULL(question.newquestFormat.HelpText__c))}" style="font-size:1.1em" ><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b><span class="helpButton" id="help1_Help"><img src="/s.gif" alt=""  class="helpIcon" title="{!question.newquestFormat.HelpText__c}"/></span>
+                           <b style="color:red;font-size:20px;">{!IF(question.newquestFormat.Is_Mandatory__c, '*','')}</b>
+                     </apex:outputPanel>
+                     <apex:outputPanel rendered="{!ISNULL(question.newquestFormat.HelpText__c)}" style="font-size:1.1em" ><b>Q.{!qnum} {!question.newquestFormat.Question_Label__c}</b>
+                          <b style="color:red;font-size:20px;">{!IF(question.newquestFormat.Is_Mandatory__c, '*','')}</b>
+                     </apex:outputPanel>
+                       <apex:pageBlockSectionItem >
+                           <apex:outputPanel >
+                              <apex:selectCheckboxes styleClass="validatecheckbox{!question.newquestFormat.Is_Mandatory__c}" layout="pageDirection" id="qmOptionList" value="{!question.multiselectlist}" >
+                              <!-- <apex:selectCheckboxes layout="pageDirection" id="qmOptionList">-->                              
+                                  <apex:selectOptions value="{!question.optionsList}" />
+                              </apex:selectCheckboxes> 
+                              <div class="errorMsg" style="display:none;">
+                                <strong>Error:</strong> 
+                                You must select a value
+                              </div>
+                           </apex:outputPanel>                   
+                       </apex:pageBlockSectionItem>    
+                   </apex:pageBlockSection><br></br>                  
+                <apex:variable var="qnum" value="{!qnum+1}"/> 
+              </apex:repeat>              
+         </apex:pageBlock>
+     </apex:outputPanel>                                           
+              </td></tr>                   
+       </table>           
+       <apex:actionFunction action="{!CreateAssignmentManager}" name="CreateAssignment" reRender="hdIssueId" />
+                    
+  </apex:form>
+    <script>
+        function populateAttachmentName(attName,pictureName) {
+            //alert(':::::');
+            //alert($("."+attName).text());
+            if($.trim($("."+attName).html()) == '') {
+                //alert('Empty');
+                //alert(pictureName);
+                //alert(':::::'+attName);
+                $("."+attName).html(pictureName)
+            } else {
+                //alert('having value');
+                var existingText = $("."+attName).text();
+                $("."+attName).html(existingText +', '+pictureName);
+                
+            }
+            
+        }
+        
+        function requiredValidate(btntype,secId) {
+            var errorFlag = false;
+            $('.validatetrue').each(function() {
+                if($(this).val() == '' || $(this).val().trim() == '') {
+                    $(this).next('div').css('display','');
+                    //alert('test');
+                    $(this).addClass('error');
+                    errorFlag = true;
+                } else {
+                    $(this).next('div').css('display','none');
+                    $(this).removeClass('error');
+                }
+            });
+            $('.validatecheckboxtrue').each(function() {
+                $(this).addClass('currentcheckbox');
+                //alert($('.currentcheckbox input[type=checkbox]:checked').length);
+                if($('.currentcheckbox input[type=checkbox]:checked').length == 0) {
+                    $( this ).parent().next('div').css('display','');
+                    //alert('checkbox');
+                    errorFlag = true;
+                } else {
+                    $( this ).parent().next('div').css('display','none');
+                }
+                $(this).removeClass('currentcheckbox');
+                
+            });
+            $('.validateradiotrue').each(function() {
+                $(this).addClass('currentRadio');
+                //alert(':::radio::::'+$('.currentRadio input[type=radio]:checked').length);
+                if($('.currentRadio input[type=radio]:checked').length == 0) {
+                    $( this ).parent().next('div').css('display','');
+                    errorFlag = true;
+                } else {
+                    $( this ).parent().next('div').css('display','none');
+                }
+                $(this).removeClass('currentRadio');
+                
+            });
+            
+            if (!errorFlag) {
+                if(btntype == 'sectionbutton') {
+                    SaveAns(secId);
+                }else if(btntype == 'button') {
+                    saveAnswerBtn();
+                } else if(btntype =='completebutton') {
+                    submitbtn();
+                }//,secId
+            
+            } else { 
+                return null;
+            }
+        }        
+
+  function closeIframe()
+        {
+            $('.ui-dialog-content').dialog('close');
+            return false;
+        }
+                
+    </script>       
+    <script>
+        var j$ = jQuery.noConflict();
+        var iframe_url= '';
+        var parent_domain = '';
+        var decisionTreeOpenWindow = function(selectedRadioValue, decisionTreeflag,questionId){
+          if(decisionTreeflag){
+                 var assignmentId = document.getElementById('{!$Component.templateForm.hdIssueId}').value;
+                 var iurl = 'https://' + window.location.hostname + '/survey/Decision';
+                 iframe_url = iurl + '?amid='+assignmentId+'&questionid='+questionId+'&selectedOption='+encodeURI(selectedRadioValue.value);           
+                 parent_domain = iframe_url;                 
+                  var src = iframe_url;
+                  var title = 'OBPI Survey';
+                  var width = 500;
+                  var height = 500;
+                iframe.attr({
+                    width: +width,
+                    height: +height,
+                    src: src
+                });
+
+            j$modalDialog.dialog("open");
+            }
+        }        
+     
+         var iframe = $('<iframe id= "survey" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen title="VA Survey"></iframe>');
+         var j$modalDialog = $("<div></div>").append(iframe).appendTo("body").dialog({
+                autoOpen: false,
+                modal: true,
+                title: 'OBPI Survey',
+                resizable: false,
+                width: "auto",
+                height: "auto",
+                close: function (event, ui){
+                    iframe.attr("src", "");
+                }
+          });
+ 
+    </script>
+</apex:page>

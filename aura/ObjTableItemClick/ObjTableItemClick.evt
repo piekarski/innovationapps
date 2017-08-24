@@ -1,0 +1,6 @@
+<aura:event type="Component" access="public" >
+  <aura:attribute name="objId" type="String" access="public" />
+  <aura:attribute name="fieldDestination" type="String" access="public" />
+  <aura:attribute name="field" type="Object" access="public" />
+  <aura:attribute name="isNew" type="Boolean" access="public" default="false"/>
+</aura:event>

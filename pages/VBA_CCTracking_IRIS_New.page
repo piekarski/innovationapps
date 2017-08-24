@@ -1,0 +1,15 @@
+<apex:page standardController="VBA_CC_Tracking_IRIS_Tracker__c">
+      <h1>Loading...</h1>
+
+         <script>
+         
+            function redirect(){
+
+                top.location.href='/VBA/apex/Entry_Page_IRIS_Production';
+            }
+  
+            window.onload = redirect;
+            
+        </script>
+
+</apex:page>

@@ -1,0 +1,35 @@
+<aura:component access="public">
+  <aura:attribute name="ObjTemplate" type="IssueRequest_Life_Cycle__c" access="public"/>
+  <aura:attribute name="fields" type="Map" access="public"/>
+  <aura:attribute name="defaultMode" type="String" access="public"/>
+  <aura:attribute name="editMode" type="Boolean" access="public" default="false"/>
+  <aura:attribute name="ObjName" type="String" access="public"/>
+  <aura:attribute name="objLabel" type="String" access="public"/>
+  <aura:attribute name="ObjId" type="String" access="public"/>
+  <aura:attribute name="isNew" type="String" access="public"/>
+
+  <div class="">
+    <article class="">
+      <div class="">
+        <span class="slds-text-heading--medium slds-m-around--medium">Edit {!v.objLabel} Details</span>
+      </div>
+      <div class="slds-card__body">
+        <aura:iteration items="{!v.fields.lightningComp_ObjBasic_FieldSet}" var="field">
+          <div class="slds-text-heading--small am-option-item">
+            <c:examField valType="{!field.fieldDataType}"
+              record="{!v.ObjTemplate}"
+              Id="{!v.ObjTemplate.Id}"
+              sObjectAPI="{!field.sObjectApi}"
+              fieldName="{!field.fieldApi}"
+              fieldLabel="{!field.fieldLabel}"
+              options="{!field.options}"
+              defaultMode="view"
+              editMode="true"/>
+          </div>
+        </aura:iteration>
+      </div>
+      <div class="slds-card__footer slds-grid slds-grid--align-spread"></div>
+    </article>
+  </div>
+
+</aura:component>

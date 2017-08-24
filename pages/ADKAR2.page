@@ -1,0 +1,30 @@
+<apex:page >
+  <!-- Begin Default Content REMOVE THIS -->
+  <hr color="#88180F" size="3px"></hr>
+
+<h1>MyVA Survey Metrics and Questions</h1>
+<br>
+<br></br>
+(Q.5)   <strong>Reinforcement</strong> to keep the change in place</br>
+<br>
+“I believe that positive changes I make at VA will be sustained by my organization.”
+</br>
+ <br>
+(Q.6)   <strong>Activity</strong> related to the change (personally performing)</br>
+<br>
+“I am actively working on a positive change initiative at VA.”
+ </br>
+<br>
+(Q.7)   <strong>Witness</strong> of cultural changes in the enterprise</br>
+<br>
+“I am currently witnessing positive changes in VA’s culture.”
+ </br>
+<br>
+(Q.8)   <strong>Impact</strong> of changes to mission</br>
+<br>
+“Changes I am observing help me put the interests of Veterans and their families first.”
+ </br>
+ 
+
+  <!-- End Default Content REMOVE THIS -->
+</apex:page>

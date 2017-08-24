@@ -1,0 +1,11 @@
+<aura:component >
+  <aura:attribute name="field" type="String" access="public"/>
+  <aura:attribute name="Id" type="String" access="public"/>
+  <aura:attribute name="fieldScript" type="String" access="public"/>
+  <aura:attribute name="fieldDestination" type="String" access="public"/>
+  <aura:attribute name="sobject" type="SObject" access="public"/>
+  <aura:attribute name="format" type="String" access="public" />
+  <aura:registerEvent name="ObjTableItemClick" type="c:ObjTableItemClick"/>
+  <div aura:Id="valueOutput"/>
+  {!v.body}
+</aura:component>

@@ -1,0 +1,57 @@
+<apex:page standardStylesheets="false" docType="html-5.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <head>
+            <title>Lightning Design System Tutorial</title>
+            <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+            <apex:stylesheet value="{!URLFOR($Resource.SLDS052, '/assets/styles/salesforce-lightning-design-system-vf.css')}" />
+        </head>
+        <style>
+            
+        </style>
+        <body>
+            <apex:pageMessages />
+            <div class="slds slds-p-around--xx-large slds-container--large slds-container--center">
+                <div class="main" role="main">
+                    <div class="slds-page-header">
+                        <div class="slds-tab--scoped">
+                            <ul class="slds-tabs--scoped__nav" role="tablist">
+                                <!--<li class="slds-tabs__item slds-text-heading--label slds-active" title="Stripe Connect" role="presentation" id="tab1">
+                                    <a href="#" role="tab" tabindex="0" aria-selected="true" style="text-decoration:none;">Decision Tree Configuration</a>
+                                </li>-->
+                                <!--<div class="slds-tabs__content slds-hide" role="tabpanel" id="tabpanel2">-->
+                                <div>
+                                    <c:DecisionTreeConfig ></c:DecisionTreeConfig> 
+                                </div>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+           
+        </body>
+             
+    </html>   
+    <!-- 
+    <script>
+        var activeComponentId, activeComponentIndex, selectedComponentId, selectedComponentIndex;
+        $('#tabpanel1').addClass('slds-show');
+        $('li.slds-tabs__item').click(function() {
+            $('li.slds-tabs__item').each(function() {
+                if($(this).hasClass('slds-active')) {
+
+                    activeComponentId = $(this).attr('id');
+                    activeComponentIndex = activeComponentId.substring(activeComponentId.length-1, activeComponentId.length);
+                    $(this).removeClass('slds-active');
+                    $('#tabpanel'+activeComponentIndex).removeClass('slds-show');
+                }
+            });
+            selectedComponentId = $(this).attr('id');
+            selectedComponentIndex = selectedComponentId.substring(selectedComponentId.length-1, selectedComponentId.length);
+            $(this).addClass('slds-active');
+            $('#tabpanel'+selectedComponentIndex).addClass('slds-show');
+        });
+    </script> 
+    -->
+</apex:page>

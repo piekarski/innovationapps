@@ -1,0 +1,32 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" standardController="VBA_CCTracking_Agent_Production_Data__c" recordSetVar="Name">
+    <Apex:stylesheet value="{!URLFOR($Resource.Styles, 'styles.css')}" />
+    <Apex:Form >
+      <Apex:DataTable value="{!Name}" var="pitem" rowClasses="odd,even">
+          <apex:column HeaderValue="Name / Date of Production Data"> 
+              <apex:outputText value="{!pitem.Name}"/>
+          </apex:column>
+          <apex:column HeaderValue="Date of Prod"> 
+              <apex:outputField value="{!pitem.VBA_CC_Date_of_Data__c}"/>
+          </apex:column>
+          <apex:column HeaderValue="Approved Available"> 
+              <apex:outputField value="{!pitem.VBA_CC_Total_Excluded_Available_Time__c}"/>
+          </apex:column>
+          <apex:column HeaderValue="Approved Talk Time"> 
+              <apex:outputField value="{!pitem.VBA_CC_Total_Talk_Excluded__c}"/>
+          </apex:column>
+          <apex:column HeaderValue="Approved # Talk"> 
+              <apex:outputField value="{!pitem.VBA_CC_Num_of_Talk_Excluded__c}"/>
+          </apex:column>
+          <apex:column HeaderValue="Pending Available"> 
+              <apex:outputField value="{!pitem.VBA_CC_Pending_Available__c}"/>
+          </apex:column>
+          <apex:column HeaderValue="Pending Talk"> 
+              <apex:outputField value="{!pitem.VBA_CC_Pending_Talk_Time__c}"/>
+          </apex:column>
+          <apex:column HeaderValue="Pending # Talk"> 
+              <apex:outputField value="{!pitem.VBA_CC_Pending_Talk_Num__c}"/>
+          </apex:column>
+      </Apex:DataTable>      
+        <apex:commandLink action="{!next}" value="Next" rendered="{!hasNext}" />
+   </Apex:Form>
+</apex:page>

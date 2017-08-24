@@ -1,0 +1,13 @@
+<apex:page sidebar="false" showHeader="false">
+  <apex:includeLightning/>
+  <div id="lightning"/>
+  <script>
+    var app = "{!$CurrentPage.parameters.app}";
+    var cmp = "{!$CurrentPage.parameters.cmp}";
+    $Lightning.use("c:" + app, function () {
+      $Lightning.createComponent("c:" + cmp, {}, "lightning", function (cmp) {
+        
+      });
+    });
+  </script>
+</apex:page>
